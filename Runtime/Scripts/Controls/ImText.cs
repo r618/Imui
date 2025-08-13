@@ -46,7 +46,8 @@ namespace Imui.Controls
                                         Color32 color,
                                         ImRect rect,
                                         bool wrap = false,
-                                        ImTextOverflow overflow = ImTextOverflow.Overflow)
+                                        ImTextOverflow overflow = ImTextOverflow.Overflow,
+                                        ImAlignment alignment = default)
         {
             // (artem-s): at least try to skip costly auto-sizing
             if (gui.Canvas.Cull(rect))
@@ -55,6 +56,7 @@ namespace Imui.Controls
             }
 
             var settings = GetTextSettings(gui, wrap, overflow);
+            settings.Align = alignment;
             settings.Size = AutoSizeTextSlow(gui, text, settings, rect.Size);
             Text(gui, text, settings, color, rect);
         }
