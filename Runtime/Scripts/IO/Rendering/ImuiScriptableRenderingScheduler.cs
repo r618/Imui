@@ -7,7 +7,7 @@ namespace Imui.IO.Rendering
 {
     public class ImuiScriptableRenderingScheduler : IImuiRenderingScheduler, IImuiRenderingContext
     {
-        private Queue<ImuiRenderDelegate> queue = new(1);
+        private Queue<IImuiRenderDelegate> queue = new(1);
         private ImDynamicArray<CommandBuffer> commandBufferPool = new(1);
         private ScriptableRenderContext activeContext;
 
@@ -16,7 +16,7 @@ namespace Imui.IO.Rendering
             RenderPipelineManager.beginCameraRendering += OnBeginCameraRendering;
         }
         
-        public void Schedule(ImuiRenderDelegate renderDelegate)
+        public void Schedule(IImuiRenderDelegate renderDelegate)
         {
             queue.Enqueue(renderDelegate);
         }
@@ -49,7 +49,7 @@ namespace Imui.IO.Rendering
             
             while (queue.TryDequeue(out var renderDelegate))
             {
-                renderDelegate(this);
+                renderDelegate.Render(this);
             }
 
             activeContext = default;

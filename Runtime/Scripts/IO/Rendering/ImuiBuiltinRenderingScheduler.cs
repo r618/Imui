@@ -8,9 +8,9 @@ namespace Imui.IO.Rendering
     {
         private ImDynamicArray<CommandBuffer> commandBufferPool = new(2);
         
-        public void Schedule(ImuiRenderDelegate renderDelegate)
+        public void Schedule(IImuiRenderDelegate renderDelegate)
         {
-            renderDelegate(this);
+            renderDelegate.Render(this);
         }
         
         public CommandBuffer CreateCommandBuffer()

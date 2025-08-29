@@ -22,7 +22,7 @@ namespace Imui.Core
         ShadedWireframe = 2
     }
 
-    public unsafe class ImGui: IDisposable
+    public unsafe class ImGui: IDisposable, IImuiRenderDelegate
     {
         private const int CONTROL_IDS_STACK_CAPACITY = 32;
 
@@ -644,10 +644,10 @@ namespace Imui.Core
 
         public void Render()
         {
-            Renderer.Schedule(Render);
+            Renderer.Schedule(this);
         }
         
-        private void Render(IImuiRenderingContext context)
+        void IImuiRenderDelegate.Render(IImuiRenderingContext context)
         {
             ImProfiler.BeginSample("ImGui.Render");
 

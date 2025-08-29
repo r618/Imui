@@ -458,7 +458,7 @@ namespace Imui.IO.UGUI
             return targetSize;
         }
 
-        public void Schedule(ImuiRenderDelegate renderDelegate)
+        public void Schedule(IImuiRenderDelegate renderDelegate)
         {
             scheduler.Schedule(renderDelegate);
         }
