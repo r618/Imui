@@ -664,7 +664,7 @@ namespace Imui.Rendering
             var vc = buffer.VerticesCount;
             var ic = buffer.IndicesCount;
 
-            buffer.EnsureVerticesCapacity(vc + points.Length * 4);
+            buffer.EnsureVerticesCapacity(vc + points.Length);
             buffer.EnsureIndicesCapacity(ic + (points.Length - 2) * 3);
 
             ref readonly var p0 = ref points[0];
@@ -706,7 +706,7 @@ namespace Imui.Rendering
                 ic += 3;
             }
 
-            buffer.AddVertices(points.Length * 4);
+            buffer.AddVertices(points.Length);
             buffer.AddIndices((points.Length - 2) * 3);
 
             ImProfiler.EndSample();
@@ -721,7 +721,7 @@ namespace Imui.Rendering
             var vc = buffer.VerticesCount;
             var ic = buffer.IndicesCount;
 
-            buffer.EnsureVerticesCapacity(vc + points.Length * 4);
+            buffer.EnsureVerticesCapacity(vc + points.Length);
             buffer.EnsureIndicesCapacity(ic + (points.Length - 2) * 3);
 
             ref readonly var p0 = ref points[0];
@@ -763,7 +763,7 @@ namespace Imui.Rendering
                 ic += 3;
             }
 
-            buffer.AddVertices(points.Length * 4);
+            buffer.AddVertices(points.Length);
             buffer.AddIndices((points.Length - 2) * 3);
 
             ImProfiler.EndSample();
