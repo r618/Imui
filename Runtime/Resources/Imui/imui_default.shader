@@ -12,7 +12,7 @@
     SubShader
     {
         Tags { "RenderType" = "Transparent" }
-        Blend SrcAlpha OneMinusSrcAlpha, SrcAlpha One
+        Blend One OneMinusSrcAlpha
         ZTest LEqual 
         ZWrite On
         Cull Back 
@@ -89,7 +89,7 @@
                     ? 1 - saturate(sdf_round_box(i.vertex.xy - _MaskRect.xy, _MaskRect.zw, _MaskCornerRadius) * 2 + 1)
                     : 1;
                 col *= i.color;
-                col.rgb *= (1 - _InvColorMul);
+                col.rgb *= col.a * (1 - _InvColorMul);
                 
                 return col;
             }
