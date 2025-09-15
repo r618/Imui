@@ -231,6 +231,7 @@ namespace Imui.Style
             sheet.List.ItemNormal.BorderThickness = 0.0f;
             sheet.List.ItemNormal.BorderRadius = theme.BorderRadius;
             sheet.List.ItemNormal.Alignment = new ImAlignment(0.0f, 0.5f);
+            sheet.List.ItemNormal.Overflow = ImTextOverflow.Ellipsis;
 
             sheet.List.ItemNormal.Normal.BackColor = palette.Front.WithAlpha(0.03f);
             sheet.List.ItemNormal.Normal.FrontColor = palette.Front;
@@ -247,6 +248,7 @@ namespace Imui.Style
             sheet.List.ItemSelected.BorderThickness = 0.0f;
             sheet.List.ItemSelected.BorderRadius = theme.BorderRadius;
             sheet.List.ItemSelected.Alignment = new ImAlignment(0.0f, 0.5f);
+            sheet.List.ItemSelected.Overflow = ImTextOverflow.Ellipsis;
 
             sheet.List.ItemSelected.Normal.BackColor = palette.Accent;
             sheet.List.ItemSelected.Normal.FrontColor = palette.AccentFront;
