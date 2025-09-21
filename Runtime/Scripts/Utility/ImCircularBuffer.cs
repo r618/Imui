@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Imui.Utility
 {
@@ -6,6 +7,12 @@ namespace Imui.Utility
     {
         public readonly int Capacity;
 
+        public ref T this[Index index]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => ref Array[(Head + (index.IsFromEnd ? Count - index.Value : index.Value)) % Capacity];
+        }
+        
         public int Head;
         public int Count;
         public T[] Array;
@@ -33,11 +40,14 @@ namespace Imui.Utility
             Array = array;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref T Get(int index)
         {
             return ref Array[(Head + index) % Capacity];
         }
 
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Set(int index, T value)
         {
             Array[(Head + index) % Capacity] = value;
@@ -49,7 +59,7 @@ namespace Imui.Utility
             Count = 0;
         }
 
-        public void PushBack(T value)
+        public int PushBack(T value)
         {
             Head = (Head - 1) % Capacity;
 
@@ -64,6 +74,8 @@ namespace Imui.Utility
             {
                 Count++;
             }
+
+            return Head;
         }
 
         public bool TryPopBack(out T value)
@@ -80,9 +92,11 @@ namespace Imui.Utility
             return true;
         }
 
-        public void PushFront(T value)
+        public int PushFront(T value)
         {
-            Array[(Head + Count) % Capacity] = value;
+            var index = (Head + Count) % Capacity;
+            
+            Array[index] = value;
 
             if (Count == Capacity)
             {
@@ -92,6 +106,8 @@ namespace Imui.Utility
             {
                 Count++;
             }
+
+            return index;
         }
         
         public bool TryPeekFront(out T value)
