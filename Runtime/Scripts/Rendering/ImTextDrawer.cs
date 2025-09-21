@@ -501,6 +501,7 @@ namespace Imui.Rendering
         {
             const float NEXT_LINE_WIDTH_THRESHOLD = 0.0001f;
             const int NO_LINE_BREAK = -1;
+            const float EPSILON = 0.001f;
 
             layout.LinesCount = 0;
             layout.Scale = size / FontRenderSize;
@@ -527,7 +528,7 @@ namespace Imui.Rendering
             var lineStart = 0;
             var textLength = text.Length;
             var charsTable = fontAsset.characterLookupTable;
-
+            var maxLines = overflow == ImTextOverflow.Overflow || boundsHeight <= 0.0f ? int.MaxValue : (int)((boundsHeight + EPSILON) / layout.LineHeight);
             var lastLineBreak = NO_LINE_BREAK;
             var lineWidthAtLineBreak = 0.0f;
             var wasBreakingChar = false;
@@ -593,12 +594,18 @@ namespace Imui.Rendering
                     {
                         maxLineWidth = line.Width;
                     }
-
-                    lineWidth = advance;
-                    lineStart = i + (newLine ? 1 : 0);
+                    
+                    layout.LinesCount++;
+                    
+                    if (layout.LinesCount >= maxLines)
+                    {
+                        break;
+                    }
 
                     layout.OffsetX = Mathf.Min(line.OffsetX, layout.OffsetX);
-                    layout.LinesCount++;
+                    
+                    lineWidth = advance;
+                    lineStart = i + (newLine ? 1 : 0);
 
                     if (layout.LinesCount >= layout.Lines.Length)
                     {
@@ -613,7 +620,7 @@ namespace Imui.Rendering
                 }
             }
 
-            if (text.Length > lineStart || text[lineStart - 1] == NEW_LINE)
+            if ((layout.LinesCount < maxLines) && (text.Length > lineStart || text[lineStart - 1] == NEW_LINE))
             {
                 ref var line = ref layout.Lines[layout.LinesCount];
 
