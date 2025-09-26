@@ -126,6 +126,7 @@ namespace Imui.Style
         public float Size;
         public float BorderThickness;
         public float BorderRadius;
+        public float MinHandleAspect;
         public ImPadding VMargin;
         public ImPadding HMargin;
         public ImStyleScrollBarState NormalState;

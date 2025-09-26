@@ -148,6 +148,7 @@ namespace Imui.Style
             sheet.Scroll.Size = (int)theme.ScrollBarSize;
             sheet.Scroll.BorderThickness = Mathf.Max(1.0f, theme.BorderThickness);
             sheet.Scroll.BorderRadius = theme.BorderRadius;
+            sheet.Scroll.MinHandleAspect = 2.0f;
             sheet.Scroll.VMargin = new ImPadding(theme.Spacing, 0, 0, 0);
             sheet.Scroll.HMargin = new ImPadding(0, 0, theme.Spacing, 0);
 

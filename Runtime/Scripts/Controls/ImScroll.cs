@@ -226,7 +226,7 @@ namespace Imui.Controls
 
             var delta = 0f;
             var absoluteSize = axis == 0 ? rect.W : rect.H;
-            var minSize = (axis == 0 ? rect.H : rect.W) - style.BorderThickness;
+            var minSize = ((axis == 0 ? rect.H : rect.W) - style.BorderThickness) * gui.Style.Scroll.MinHandleAspect;
             var size = Mathf.Max(minSize, Mathf.Clamp01(normalSize) * absoluteSize);
             var position = Mathf.Clamp01(normalPosition) * (absoluteSize - size);
 
