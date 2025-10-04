@@ -214,11 +214,11 @@ namespace Imui.Controls
         {
             if (active)
             {
-                velocity = Vector2.Lerp(velocity, currentOffset - prevOffset, Time.deltaTime * VELOCITY_SHARPNESS);
+                velocity = Vector2.Lerp(velocity, currentOffset - prevOffset, Time.unscaledDeltaTime * VELOCITY_SHARPNESS);
             }
             else
             {
-                velocity *= Mathf.Pow(DECELERATION_RATE, Time.deltaTime);
+                velocity *= Mathf.Pow(DECELERATION_RATE, Time.unscaledDeltaTime);
             }
         }
         

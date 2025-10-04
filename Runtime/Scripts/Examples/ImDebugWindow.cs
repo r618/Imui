@@ -125,7 +125,7 @@ namespace Imui.Examples
 
         private static void AppendFrameTime()
         {
-            frameTimes.PushFront(Time.deltaTime);
+            frameTimes.PushFront(Time.unscaledDeltaTime);
 
             maxFrameTime = 0.0f;
             avgFrameTime = 0.0f;

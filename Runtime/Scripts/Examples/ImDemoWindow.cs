@@ -683,7 +683,7 @@ namespace Imui.Examples
             var bounds = gui
                          .AddLayoutRectWithSpacing(gui.GetLayoutWidth(), gui.GetRowHeight() * 1.25f)
                          .WithPadding(left: bouncingBallSize / 2.0f, right: bouncingBallSize / 2.0f);
-            var dt = Time.deltaTime * bouncingBallSpeed;
+            var dt = Time.unscaledDeltaTime * bouncingBallSpeed;
 
             bouncingBallTime += dt;
 
