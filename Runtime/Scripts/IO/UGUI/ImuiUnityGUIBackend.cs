@@ -403,7 +403,7 @@ namespace Imui.IO.UGUI
         
         private ImMouseDevice GetDeviceType(PointerEventData e)
         {
-            return e.pointerId >= 0 ? ImMouseDevice.Touch : ImMouseDevice.Mouse;
+            return Input.touchSupported && e.pointerId >= 0 ? ImMouseDevice.Touch : ImMouseDevice.Mouse;
         }
 
         private bool IsAnyTouchBegan()
