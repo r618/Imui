@@ -47,6 +47,16 @@ namespace Imui.Controls
             rect.H = height;
             return rect;
         }
+        
+        public static ImRect TakeTop(this ImRect rect, float height, float space, out ImRect bottom)
+        {
+            bottom = rect;
+            bottom.H = rect.H - height;
+            rect.Y += bottom.H;
+            rect.H = height;
+            bottom.H -= space;
+            return rect;
+        }
 
         public static ImRect TakeBottom(this ImRect rect, float height)
         {
