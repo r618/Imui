@@ -264,7 +264,7 @@ namespace Imui.Controls
                     }
                     break;
 
-                case ImMouseEventType.Click when evt.Device == ImMouseDevice.Touch && hovered:
+                case ImMouseEventType.Click when evt.Device == ImMouseDevice.Touch && hovered && !selected:
                 case ImMouseEventType.Down or ImMouseEventType.BeginDrag when evt.Device == ImMouseDevice.Mouse && evt.LeftButton && hovered:
                 case ImMouseEventType.Down or ImMouseEventType.BeginDrag when evt.Device == ImMouseDevice.Touch && evt.LeftButton && hovered && selected:
                     if (!selected)
