@@ -15,6 +15,7 @@ namespace Imui.IO.Touch
         public bool Muiltiline;
         public ImTouchKeyboardType Type;
         public int CharactersLimit;
+        public RangeInt Selection;
     }
 
     public class ImTouchKeyboard: IDisposable
@@ -53,6 +54,7 @@ namespace Imui.IO.Touch
                     GetType(settings.Type),
                     false,
                     settings.Muiltiline);
+                
                 TouchKeyboard.characterLimit = settings.CharactersLimit;
             }
 
@@ -61,6 +63,17 @@ namespace Imui.IO.Touch
                 TouchKeyboard.active = true;
             }
 
+            if (TouchKeyboard.active && TouchKeyboard.canSetSelection)
+            {
+                var prev = TouchKeyboard.selection;
+                var changed = prev.start != settings.Selection.start || prev.length != settings.Selection.length;
+                if (changed)
+                {
+                    // (artem-s): setting selection does allocate currently edited string for range checking
+                    TouchKeyboard.selection = settings.Selection;
+                }
+            }
+            
             touchKeyboardRequestFrame = Time.frameCount;
         }
 
@@ -85,6 +98,14 @@ namespace Imui.IO.Touch
 
                 switch (TouchKeyboard.status)
                 {
+                    case TouchScreenKeyboard.Status.Visible when TouchScreenKeyboard.inputFieldAppearance == TouchScreenKeyboard.InputFieldAppearance.AlwaysHidden:
+                        if (Input.inputString?.Length > 0)
+                        {
+                            var text = TouchKeyboard.text;
+                            RangeInt? selection = TouchKeyboard.canGetSelection ? TouchKeyboard.selection : null;
+                            textEvent = new ImTextEvent(ImTextEventType.Set, text, selection);
+                        }
+                        break;
                     case TouchScreenKeyboard.Status.Canceled:
                         textEvent = new ImTextEvent(ImTextEventType.Cancel);
                         shouldHide = true;

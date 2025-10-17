@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 using Imui.Core;
+using Imui.IO;
 using Imui.IO.Events;
 using Imui.IO.Touch;
 using Imui.IO.Utility;
@@ -321,6 +322,17 @@ namespace Imui.Controls
                     case ImTextEventType.Cancel:
                         gui.ResetActiveControl();
                         break;
+                    case ImTextEventType.Set:
+                        textChanged = buffer.Length != 0 || textEvent.Text.Length != 0;
+                        buffer.Clear(textEvent.Text.Length);
+                        Insert(ref state, ref buffer, textEvent.Text);
+                        if (textEvent.Selection != null)
+                        {
+                            state.Caret = textEvent.Selection.Value.start;
+                            state.Selection = textEvent.Selection.Value.length;
+                        }
+                        gui.Input.UseTextEvent();
+                        break;
                     case ImTextEventType.Submit:
                         gui.ResetActiveControl();
                         textChanged = buffer.Length != 0 || textEvent.Text.Length != 0;
@@ -331,11 +343,15 @@ namespace Imui.Controls
                     default:
                         if (editable)
                         {
+                            // (artem-s): touch keyboard doesn't like negative length
+                            var begin = state.Selection < 0 ? state.Caret + state.Selection : state.Caret;
+                            var end = state.Selection < 0 ? state.Caret : state.Caret + state.Selection;
                             var settings = new ImTouchKeyboardSettings()
                             {
                                 Muiltiline = multiline,
                                 Type = filter?.KeyboardType ?? ImTouchKeyboardType.Default,
-                                CharactersLimit = filter == null ? 0 : ImTextTempFilterBuffer.BUFFER_LENGTH
+                                CharactersLimit = filter == null ? 0 : ImTextTempFilterBuffer.BUFFER_LENGTH,
+                                Selection = new RangeInt(begin, end - begin)
                             };
 
                             gui.Input.RequestTouchKeyboard(id, buffer, settings);
