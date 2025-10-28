@@ -54,7 +54,7 @@ namespace Imui.IO.Touch
                     GetType(settings.Type),
                     false,
                     settings.Muiltiline);
-                
+
                 TouchKeyboard.characterLimit = settings.CharactersLimit;
             }
 
@@ -73,7 +73,7 @@ namespace Imui.IO.Touch
                     TouchKeyboard.selection = settings.Selection;
                 }
             }
-            
+
             touchKeyboardRequestFrame = Time.frameCount;
         }
 
@@ -95,10 +95,15 @@ namespace Imui.IO.Touch
             if (TouchKeyboard != null)
             {
                 var shouldHide = Mathf.Abs(Time.frameCount - touchKeyboardRequestFrame) > TOUCH_KEYBOARD_CLOSE_FRAMES_THRESHOLD;
+                var inputFieldHidden = TouchScreenKeyboard.hideInput;
+
+#if UNITY_6000_0_OR_NEWER
+                inputFieldHidden |= TouchScreenKeyboard.inputFieldAppearance == TouchScreenKeyboard.InputFieldAppearance.AlwaysHidden;
+#endif
 
                 switch (TouchKeyboard.status)
                 {
-                    case TouchScreenKeyboard.Status.Visible when TouchScreenKeyboard.inputFieldAppearance == TouchScreenKeyboard.InputFieldAppearance.AlwaysHidden:
+                    case TouchScreenKeyboard.Status.Visible when inputFieldHidden:
                         if (Input.inputString?.Length > 0)
                         {
                             var text = TouchKeyboard.text;
