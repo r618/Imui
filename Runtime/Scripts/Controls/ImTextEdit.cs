@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
 using Imui.Core;
-using Imui.IO;
 using Imui.IO.Events;
 using Imui.IO.Touch;
 using Imui.IO.Utility;
@@ -17,6 +16,129 @@ namespace Imui.Controls
         public int Selection;
     }
 
+    public ref struct ImTextEditBuffer
+    {
+        public int Length => mutableLength >= 0 ? mutableLength : source.Length;
+
+        public char this[Index index] => ((ReadOnlySpan<char>)this)[index];
+        
+        private readonly ImArena arena;
+        private readonly ReadOnlySpan<char> source;
+        private readonly string sourceString;
+        
+        private Span<char> mutable;
+        private int mutableLength;
+
+        public ImTextEditBuffer(int mutableLength, ImArena arena): this(arena.AllocArray<char>(mutableLength), mutableLength, arena) { }
+
+        public ImTextEditBuffer(string source, ImArena arena)
+        {
+            this.arena = arena;
+            this.source = source;
+            this.sourceString = source;
+            
+            this.mutableLength = -1;
+            this.mutable = default;
+        }
+        
+        public ImTextEditBuffer(ReadOnlySpan<char> source, ImArena arena)
+        {
+            this.arena = arena;
+            this.source = source;
+            this.sourceString = null;
+
+            this.mutableLength = -1;
+            this.mutable = default;
+        }
+        
+        public ImTextEditBuffer(Span<char> arr, int mutableLength, ImArena arena)
+        {
+            this.arena = arena;
+            this.source = null;
+            this.sourceString = null;
+            
+            this.mutableLength = mutableLength;
+            this.mutable = arr;
+        }
+
+        private void MakeMutable(int capacity)
+        {
+            if (mutableLength < 0)
+            {
+                mutable = arena.AllocArray<char>(capacity);
+                source.CopyTo(mutable);
+                mutableLength = source.Length;
+            }
+            else
+            {
+                mutable = arena.ReallocArray(ref mutable, capacity);
+            }
+        }
+
+        public void Clear(int len)
+        {
+            MakeMutable(len);
+            mutableLength = 0;
+        }
+
+        public void Remove(int pos, int count)
+        {
+            if (pos < 0 || pos >= Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pos));
+            }
+
+            if (count < 1)
+            {
+                return;
+            }
+            
+            MakeMutable(Length);
+            
+            count = pos + count > mutableLength ? mutableLength - pos : count;
+            mutable[(pos + count)..].CopyTo(mutable[pos..]);
+            mutableLength -= count;
+        }
+
+        public unsafe void Insert(int pos, char chr)
+        {
+            Insert(pos, new ReadOnlySpan<char>(&chr, 1));
+        }
+
+        public void Insert(int pos, ReadOnlySpan<char> span)
+        {
+            if (pos < 0 || pos > Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pos));
+            }
+
+            if (span.Length == 0)
+            {
+                return;
+            }
+            
+            MakeMutable(Length + span.Length);
+
+            if (pos != mutableLength)
+            {
+                mutable[pos..mutableLength].CopyTo(mutable[(pos + span.Length)..]);
+            }
+            
+            span.CopyTo(mutable[pos..]);
+            mutableLength += span.Length;
+        }
+
+        public override string ToString()
+        {
+            return mutableLength >= 0 ? new string(mutable[..mutableLength]) : (sourceString ?? new string(source));
+        }
+
+        public static implicit operator ReadOnlySpan<char>(ImTextEditBuffer buffer)
+        {
+            return buffer.mutableLength >= 0 ? buffer.mutable[..buffer.mutableLength] : buffer.source;
+        }
+    }
+    
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct ImTextTempFilterBuffer
     {
@@ -93,7 +215,7 @@ namespace Imui.Controls
 
         public static void TextEditReadonly(this ImGui gui, ReadOnlySpan<char> text, ImRect rect, bool multiline, ImAdjacency adjacency = ImAdjacency.None)
         {
-            var buffer = new ImTextEditBuffer(text);
+            var buffer = new ImTextEditBuffer(text, gui.Arena);
 
             gui.BeginReadOnlyWithoutStyleChanges(true);
             TextEdit(gui, ref buffer, rect, multiline, adjacency: adjacency);
@@ -173,11 +295,11 @@ namespace Imui.Controls
                                     ImTextEditFilter filter = default,
                                     ImAdjacency adjacency = default)
         {
-            var buffer = new ImTextEditBuffer(text);
+            var buffer = new ImTextEditBuffer(text, gui.Arena);
             var changed = TextEdit(gui, id, ref buffer, ref state, rect, multiline, filter, adjacency);
             if (changed)
             {
-                text = buffer.GetString();
+                text = buffer.ToString();
             }
 
             return changed;
@@ -528,7 +650,7 @@ namespace Imui.Controls
                 state.Caret += state.Selection;
             }
 
-            buffer.Delete(state.Caret, Mathf.Abs(state.Selection));
+            buffer.Remove(state.Caret, Mathf.Abs(state.Selection));
             state.Selection = 0;
             return true;
         }
@@ -542,7 +664,7 @@ namespace Imui.Controls
 
             if (state.Caret > 0)
             {
-                buffer.Delete(--state.Caret, 1);
+                buffer.Remove(--state.Caret, 1);
                 return true;
             }
 
@@ -558,7 +680,7 @@ namespace Imui.Controls
 
             if (state.Caret < buffer.Length)
             {
-                buffer.Delete(state.Caret, 1);
+                buffer.Remove(state.Caret, 1);
                 return true;
             }
 
@@ -727,7 +849,7 @@ namespace Imui.Controls
                 caretOffset.y += frame.Bounds.Bottom - caretBottom.y;
             }
 
-            var charWidth = state.Caret >= buffer.Length ? 0 : gui.TextDrawer.GetCharacterAdvance(buffer.At(state.Caret), layout.Size);
+            var charWidth = state.Caret >= buffer.Length ? 0 : gui.TextDrawer.GetCharacterAdvance(buffer[state.Caret], layout.Size);
             var caretLeft = caretTop.x;
             var caretRight = caretTop.x + charWidth;
 
@@ -929,142 +1051,6 @@ namespace Imui.Controls
 
             return tempBuffer;
         }
-    }
-
-    // TODO (artem-s): use arena allocator instead of static array
-    public ref struct ImTextEditBuffer
-    {
-        public const int DEFAULT_MUTABLE_BUFFER_CAPACITY = 1024;
-
-        private static char[] staticBuffer = new char[DEFAULT_MUTABLE_BUFFER_CAPACITY];
-
-        public int Length;
-        public ReadOnlySpan<char> InitSpan;
-        public bool InitWithSpan;
-        public string InitText;
-        public char[] Buffer;
-
-        public ImTextEditBuffer(string text)
-        {
-            InitSpan = default;
-            InitText = text ?? string.Empty;
-            InitWithSpan = false;
-            Buffer = null;
-            Length = InitText.Length;
-        }
-
-        public ImTextEditBuffer(ReadOnlySpan<char> text)
-        {
-            InitSpan = text;
-            InitText = null;
-            InitWithSpan = true;
-            Buffer = null;
-            Length = text.Length;
-        }
-
-        public char At(int index)
-        {
-            return Buffer?[index] ?? (InitWithSpan ? InitSpan[index] : InitText[index]);
-        }
-
-        public string GetString()
-        {
-            if (Buffer != null)
-            {
-                return new string(Buffer, 0, Length);
-            }
-
-            return InitText ?? InitSpan.ToString();
-        }
-
-        public void MakeMutable(int capacity = DEFAULT_MUTABLE_BUFFER_CAPACITY)
-        {
-            if (InitWithSpan)
-            {
-                var nextLength = Mathf.NextPowerOfTwo(Mathf.Max(InitSpan.Length, capacity));
-                if (nextLength > staticBuffer.Length)
-                {
-                    Array.Resize(ref staticBuffer, nextLength);
-                }
-
-                Buffer = staticBuffer;
-                InitSpan.CopyTo(Buffer);
-                Length = InitSpan.Length;
-                InitWithSpan = false;
-            }
-            else if (InitText != null)
-            {
-                var nextLength = Mathf.NextPowerOfTwo(Mathf.Max(InitText.Length, capacity));
-                if (nextLength > staticBuffer.Length)
-                {
-                    Array.Resize(ref staticBuffer, nextLength);
-                }
-
-                Buffer = staticBuffer;
-                InitText.CopyTo(0, Buffer, 0, InitText.Length);
-                Length = InitText.Length;
-                InitText = null;
-            }
-            else
-            {
-                if (Buffer == null)
-                {
-                    Buffer = staticBuffer;
-                    Length = 0;
-                }
-
-                if (Buffer.Length < capacity)
-                {
-                    Array.Resize(ref Buffer, Mathf.NextPowerOfTwo(capacity));
-                }
-            }
-        }
-
-        public void Clear(int length)
-        {
-            MakeMutable(length);
-            Length = 0;
-        }
-
-        public void Clear()
-        {
-            MakeMutable(Length);
-            Length = 0;
-        }
-
-        public void Delete(int position, int count)
-        {
-            MakeMutable(Length);
-
-            if (position < Length)
-            {
-                Array.Copy(Buffer, position + count, Buffer, position, Length - (position + count));
-                Array.Fill(Buffer, (char)0, Length - count, count);
-                Length -= count;
-            }
-        }
-
-        public unsafe void Insert(int position, char c)
-        {
-            Insert(position, new ReadOnlySpan<char>(&c, 1));
-        }
-
-        public void Insert(int position, ReadOnlySpan<char> text)
-        {
-            MakeMutable(Length + text.Length);
-
-            position = Mathf.Clamp(position, 0, Length);
-            if (position < Length)
-            {
-                Array.Copy(Buffer, position, Buffer, position + text.Length, Length - position);
-            }
-
-            text.CopyTo(((Span<char>)Buffer)[position..]);
-            Length += text.Length;
-        }
-
-        public static implicit operator ReadOnlySpan<char>(ImTextEditBuffer buffer) =>
-            buffer.InitWithSpan ? buffer.InitSpan : buffer.InitText ?? new ReadOnlySpan<char>(buffer.Buffer, 0, buffer.Length);
     }
 
     public abstract class ImTextEditFilter

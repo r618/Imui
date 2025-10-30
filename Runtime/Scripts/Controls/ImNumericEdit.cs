@@ -248,12 +248,12 @@ namespace Imui.Controls
                 gui.PopId();
             }
 
-            var buffer = new ImTextEditBuffer();
-            buffer.MakeMutable();
+            var tempBuffer = gui.Arena.AllocArray<char>(64);
+            var buffer = new ImTextEditBuffer(tempBuffer, tempBuffer.Length, gui.Arena);
 
-            if (filter.TryFormat(buffer.Buffer, value, out var length, format))
+            if (filter.TryFormat(tempBuffer, value, out var length, format))
             {
-                buffer.Length = length;
+                buffer = new ImTextEditBuffer(tempBuffer, length, gui.Arena);
             }
             else
             {
