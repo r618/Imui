@@ -60,7 +60,7 @@ namespace Imui.Controls
             this.mutableLength = mutableLength;
             this.mutable = arr;
         }
-
+        
         private void MakeMutable(int capacity)
         {
             if (mutableLength < 0)

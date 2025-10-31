@@ -1,15 +1,14 @@
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Imui.Core;
 using Imui.IO.Events;
 using Imui.IO.Touch;
 using Imui.Rendering;
 using Imui.Style;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 // ReSharper disable BuiltInTypeReferenceStyle
-
 namespace Imui.Controls
 {
     [Flags]
@@ -23,35 +22,22 @@ namespace Imui.Controls
 
     public static class ImNumericEdit
     {
-        // public static readonly ByteFilter FilterByte = new();
-        // public static readonly Int16Filter FilterInt16 = new();
-        // public static readonly Int32Filter FilterInt32 = new();
-        // public static readonly Int64Filter FilterInt64 = new();
-        // public static readonly SingleFilter FilterSingle = new();
-        // public static readonly DoubleFilter FilterDouble = new();
-
-        private static void GetIdAndRect(ImGui gui, ImSize size, out uint id, out ImRect rect)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ImGui gui,
+                                       ref byte value,
+                                       ImSize size = default,
+                                       ReadOnlySpan<char> format = default,
+                                       byte step = 1,
+                                       byte min = byte.MinValue,
+                                       byte max = byte.MaxValue,
+                                       ImNumericEditFlag flags = default)
         {
             gui.AddSpacingIfLayoutFrameNotEmpty();
-
-            id = gui.GetNextControlId();
-            rect = ImTextEdit.AddRect(gui, size, false, out _);
+            var rect = ImTextEdit.AddRect(gui, size, false, out _);
+            return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
         }
 
-        public static bool NumericEdit(this ImGui gui,
-                                       ref byte value,
-                                       ImSize size = default,
-                                       ReadOnlySpan<char> format = default,
-                                       byte step = 1,
-                                       byte min = byte.MinValue,
-                                       byte max = byte.MaxValue,
-                                       ImNumericEditFlag flags = default)
-        {
-            GetIdAndRect(gui, size, out var id, out var rect);
-
-            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(this ImGui gui,
                                        ref short value,
                                        ImSize size = default,
@@ -61,11 +47,12 @@ namespace Imui.Controls
                                        short max = short.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            GetIdAndRect(gui, size, out var id, out var rect);
-
-            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+            gui.AddSpacingIfLayoutFrameNotEmpty();
+            var rect = ImTextEdit.AddRect(gui, size, false, out _);
+            return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(this ImGui gui,
                                        ref int value,
                                        ImSize size = default,
@@ -75,11 +62,12 @@ namespace Imui.Controls
                                        int max = int.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            GetIdAndRect(gui, size, out var id, out var rect);
-
-            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+            gui.AddSpacingIfLayoutFrameNotEmpty();
+            var rect = ImTextEdit.AddRect(gui, size, false, out _);
+            return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(this ImGui gui,
                                        ref long value,
                                        ImSize size = default,
@@ -89,11 +77,12 @@ namespace Imui.Controls
                                        long max = long.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            GetIdAndRect(gui, size, out var id, out var rect);
-
-            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+            gui.AddSpacingIfLayoutFrameNotEmpty();
+            var rect = ImTextEdit.AddRect(gui, size, false, out _);
+            return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(this ImGui gui,
                                        ref float value,
                                        ImSize size = default,
@@ -103,11 +92,12 @@ namespace Imui.Controls
                                        float max = float.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            GetIdAndRect(gui, size, out var id, out var rect);
-
-            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+            gui.AddSpacingIfLayoutFrameNotEmpty();
+            var rect = ImTextEdit.AddRect(gui, size, false, out _);
+            return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(this ImGui gui,
                                        ref double value,
                                        ImSize size = default,
@@ -117,11 +107,102 @@ namespace Imui.Controls
                                        double max = double.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            GetIdAndRect(gui, size, out var id, out var rect);
-
+            gui.AddSpacingIfLayoutFrameNotEmpty();
+            var rect = ImTextEdit.AddRect(gui, size, false, out _);
+            return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(ImGui gui,
+                                       ref byte value,
+                                       ImRect rect,
+                                       ReadOnlySpan<char> format = default,
+                                       byte step = 1,
+                                       byte min = byte.MinValue,
+                                       byte max = byte.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var id = gui.GetNextControlId();
+            
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(ImGui gui,
+                                       ref short value,
+                                       ImRect rect,
+                                       ReadOnlySpan<char> format = default,
+                                       short step = 1,
+                                       short min = short.MinValue,
+                                       short max = short.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var id = gui.GetNextControlId();
+            
+            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(ImGui gui,
+                                       ref int value,
+                                       ImRect rect,
+                                       ReadOnlySpan<char> format = default,
+                                       int step = 1,
+                                       int min = int.MinValue,
+                                       int max = int.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var id = gui.GetNextControlId();
+            
+            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(ImGui gui,
+                                       ref long value,
+                                       ImRect rect,
+                                       ReadOnlySpan<char> format = default,
+                                       long step = 1L,
+                                       long min = long.MinValue,
+                                       long max = long.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var id = gui.GetNextControlId();
+            
+            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(ImGui gui,
+                                       ref float value,
+                                       ImRect rect,
+                                       ReadOnlySpan<char> format = default,
+                                       float step = 0.1f,
+                                       float min = float.MinValue,
+                                       float max = float.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var id = gui.GetNextControlId();
+            
+            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(ImGui gui,
+                                       ref double value,
+                                       ImRect rect,
+                                       ReadOnlySpan<char> format = default,
+                                       double step = 0.1d,
+                                       double min = double.MinValue,
+                                       double max = double.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var id = gui.GetNextControlId();
+            
+            return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        uint id,
                                        ref byte value,
@@ -132,12 +213,17 @@ namespace Imui.Controls
                                        byte max = byte.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            gui.Text("Not implemented", rect: rect);
-            return false;
+            var numberValue = new NumberValue(value);
+            var changed = NumericEditControl(gui, id, ref numberValue, rect, format, step, min, max, flags);
+            if (changed)
+            {
+                value = numberValue.ValueByte;
+            }
 
-            // return NumericEditControl(gui, id, ref value, FilterByte, rect, format, step, min, max, flags);
+            return changed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        uint id,
                                        ref short value,
@@ -148,12 +234,17 @@ namespace Imui.Controls
                                        short max = short.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            gui.Text("Not implemented", rect: rect);
-            return false;
+            var numberValue = new NumberValue(value);
+            var changed = NumericEditControl(gui, id, ref numberValue, rect, format, step, min, max, flags);
+            if (changed)
+            {
+                value = numberValue.ValueInt16;
+            }
 
-            //return NumericEditControl(gui, id, ref value, FilterInt16, rect, format, step, min, max, flags);
+            return changed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        uint id,
                                        ref int value,
@@ -168,12 +259,13 @@ namespace Imui.Controls
             var changed = NumericEditControl(gui, id, ref numberValue, rect, format, step, min, max, flags);
             if (changed)
             {
-                value = numberValue.valueInt32;
+                value = numberValue.ValueInt32;
             }
 
             return changed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        uint id,
                                        ref long value,
@@ -184,12 +276,17 @@ namespace Imui.Controls
                                        long max = long.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            gui.Text("Not implemented", rect: rect);
-            return false;
+            var numberValue = new NumberValue(value);
+            var changed = NumericEditControl(gui, id, ref numberValue, rect, format, step, min, max, flags);
+            if (changed)
+            {
+                value = numberValue.ValueInt64;
+            }
 
-            // return NumericEditControl(gui, id, ref value, FilterInt64, rect, format, step, min, max, flags);
+            return changed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        uint id,
                                        ref float value,
@@ -204,12 +301,13 @@ namespace Imui.Controls
             var changed = NumericEditControl(gui, id, ref numberValue, rect, format, step, min, max, flags);
             if (changed)
             {
-                value = numberValue.valueSingle;
+                value = numberValue.ValueSingle;
             }
 
             return changed;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        uint id,
                                        ref double value,
@@ -220,10 +318,14 @@ namespace Imui.Controls
                                        double max = double.MaxValue,
                                        ImNumericEditFlag flags = default)
         {
-            gui.Text("Not implemented", rect: rect);
-            return false;
+            var numberValue = new NumberValue(value);
+            var changed = NumericEditControl(gui, id, ref numberValue, rect, format, step, min, max, flags);
+            if (changed)
+            {
+                value = numberValue.ValueDouble;
+            }
 
-            // return NumericEditControl(gui, id, ref value, FilterDouble, rect, format, step, min, max, flags);
+            return changed;
         }
 
         public static unsafe bool NumericEditControl(ImGui gui,
@@ -254,7 +356,7 @@ namespace Imui.Controls
 
             if (!active && useSlider)
             {
-                // (artem-s): when double clicking, pass control to text editor
+                // (artem-s): when double-clicking, pass control to the text editor
                 if (evt.LeftButton && (evt.Type != ImMouseEventType.Down || evt.Count < 2))
                 {
                     var sliderMin = min.AsDouble();
@@ -278,24 +380,9 @@ namespace Imui.Controls
 
             gui.PopId();
 
-            ImTextEditBuffer textBuffer;
-
-            if (active)
-            {
-                ref var editBuffer = ref gui.Storage.Get<EditBuffer>(bufferId);
-                fixed (char* ptr = editBuffer.Buffer)
-                {
-                    var span = new Span<char>(ptr, EditBuffer.BUFFER_LENGTH);
-                    textBuffer = new ImTextEditBuffer(span, editBuffer.Count, gui.Arena);
-                }
-            }
-            else
-            {
-                var tempBuffer = gui.Arena.AllocArray<char>(EditBuffer.BUFFER_LENGTH);
-                var tempBufferLength = value.Format(tempBuffer);
-
-                textBuffer = new ImTextEditBuffer(tempBuffer[..tempBufferLength], gui.Arena);
-            }
+            var textBuffer = active
+                ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena)
+                : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena);
 
             var adjacency = usePlusMinusButtons ? ImAdjacency.Left : ImAdjacency.None;
             if ((flags & ImNumericEditFlag.RightAdjacent) != 0)
@@ -351,15 +438,11 @@ namespace Imui.Controls
                 changed = gui.TextEdit(id, ref textBuffer, rect, false, adjacency, ImTouchKeyboardType.Numeric);
             }
 
-            if (changed)
+            var justActivated = !active && gui.IsControlActive(id);
+            if (justActivated)
             {
                 ref var editBuffer = ref gui.Storage.Get<EditBuffer>(bufferId);
-                editBuffer.Populate(textBuffer);
-                
-                if (NumberValue.TryParse(value.Type, textBuffer, out var newValue))
-                {
-                    value = newValue;
-                }
+                editBuffer.Populate(value.Format(gui.Formatter));
             }
 
             if (delta != 0)
@@ -370,13 +453,19 @@ namespace Imui.Controls
 
             if (changed)
             {
-                value.Clamp(min, max);
-            }
+                if (active)
+                {
+                    // TODO (artem-s): limit number of characters to EditBuffer.BUFFER_LENGTH
+                    ref var editBuffer = ref gui.Storage.Get<EditBuffer>(bufferId);
+                    editBuffer.Populate(textBuffer);
 
-            if (!active && gui.GetActiveControl() == id)
-            {
-                ref var editBuffer = ref gui.Storage.Get<EditBuffer>(bufferId);
-                editBuffer.Populate(value);
+                    if (NumberValue.TryParse(value.Type, textBuffer, out var newValue))
+                    {
+                        value = newValue;
+                    }
+                }
+
+                value.Clamp(min, max);
             }
 
             return changed;
@@ -445,29 +534,9 @@ namespace Imui.Controls
             return delta;
         }
 
-        public unsafe struct EditBuffer
+        private static bool IsInteger(this NumberType type)
         {
-            public const int BUFFER_LENGTH = 64;
-
-            public fixed char Buffer[BUFFER_LENGTH];
-            public int Count;
-
-            public void Populate(ReadOnlySpan<char> str)
-            {
-                fixed (char* buf = Buffer)
-                {
-                    str.CopyTo(new Span<char>(buf, BUFFER_LENGTH));
-                    Count = str.Length;
-                }
-            }
-            
-            public void Populate(NumberValue value)
-            {
-                fixed (char* buf = Buffer)
-                {
-                    Count = value.Format(new Span<char>(buf, BUFFER_LENGTH));
-                }
-            }
+            return type is NumberType.Byte or NumberType.Int16 or NumberType.Int32 or NumberType.Int64;
         }
 
         public enum NumberType
@@ -480,23 +549,190 @@ namespace Imui.Controls
             Double
         }
 
-        public static bool IsInteger(this NumberType type)
+        public unsafe struct EditBuffer
         {
-            return type is NumberType.Byte or NumberType.Int16 or NumberType.Int32 or NumberType.Int64;
+            public const int BUFFER_LENGTH = 256;
+
+            private fixed char fixedBuffer[BUFFER_LENGTH];
+            private int count;
+
+            public void Populate(ReadOnlySpan<char> str)
+            {
+                fixed (char* buf = fixedBuffer)
+                {
+                    str.CopyTo(new Span<char>(buf, BUFFER_LENGTH));
+                    count = str.Length;
+                }
+            }
+            
+            public static implicit operator ReadOnlySpan<char>(EditBuffer buffer)
+            {
+                return new ReadOnlySpan<char>(buffer.fixedBuffer, buffer.count);
+            }
         }
 
         public struct NumberValue
         {
-            private static readonly CultureInfo CultureInvariant = CultureInfo.InvariantCulture;
-
             // (artem-s): allow using comma as a decimal separator
             private static readonly CultureInfo CultureDeutsch = new("de");
+            private static readonly CultureInfo CultureInvariant = CultureInfo.InvariantCulture;
 
-            public static bool IsValid(NumberType type, ReadOnlySpan<char> span)
+            private const NumberStyles INTEGER_STYLE = NumberStyles.Integer | NumberStyles.AllowExponent;
+            private const NumberStyles FLOAT_STYLE = NumberStyles.Float;
+            
+            public readonly NumberType Type;
+
+            public Byte ValueByte;
+            public Int16 ValueInt16;
+            public Int32 ValueInt32;
+            public Int64 ValueInt64;
+            public Single ValueSingle;
+            public Double ValueDouble;
+
+            public NumberValue(Byte value)
             {
-                return span.Length > 0 && TryParse(type, span, out _);
+                Type = NumberType.Byte;
+                ValueByte = value;
+                ValueInt16 = 0;
+                ValueInt32 = 0;
+                ValueInt64 = 0;
+                ValueSingle = 0;
+                ValueDouble = 0;
+            }
+            
+            public NumberValue(Int16 value)
+            {
+                Type = NumberType.Int16;
+                ValueByte = 0;
+                ValueInt16 = value;
+                ValueInt32 = 0;
+                ValueInt64 = 0;
+                ValueSingle = 0;
+                ValueDouble = 0;
+            }
+            
+            public NumberValue(Int32 value)
+            {
+                Type = NumberType.Int32;
+                ValueByte = 0;
+                ValueInt16 = 0;
+                ValueInt32 = value;
+                ValueInt64 = 0;
+                ValueSingle = 0;
+                ValueDouble = 0;
+            }
+            
+            public NumberValue(Int64 value)
+            {
+                Type = NumberType.Int64;
+                ValueByte = 0;
+                ValueInt16 = 0;
+                ValueInt32 = 0;
+                ValueInt64 = value;
+                ValueSingle = 0;
+                ValueDouble = 0;
+            }
+            
+            public NumberValue(Single value)
+            {
+                Type = NumberType.Single;
+                ValueByte = 0;
+                ValueInt16 = 0;
+                ValueInt32 = 0;
+                ValueInt64 = 0;
+                ValueSingle = value;
+                ValueDouble = 0;
+            }
+            
+            public NumberValue(Double value)
+            {
+                Type = NumberType.Double;
+                ValueByte = 0;
+                ValueInt16 = 0;
+                ValueInt32 = 0;
+                ValueInt64 = 0;
+                ValueSingle = 0;
+                ValueDouble = value;
             }
 
+            private NumberValue(NumberType type)
+            {
+                Type = type;
+                ValueByte = 0;
+                ValueInt16 = 0;
+                ValueInt32 = 0;
+                ValueInt64 = 0;
+                ValueSingle = 0;
+                ValueDouble = 0;
+            }
+
+            public double AsDouble()
+            {
+                return Type switch
+                {
+                    NumberType.Byte => ValueByte,
+                    NumberType.Int16 => ValueInt16,
+                    NumberType.Int32 => ValueInt32,
+                    NumberType.Int64 => ValueInt64,
+                    NumberType.Single => ValueSingle,
+                    NumberType.Double => ValueDouble,
+                    _ => throw new NotImplementedException()
+                };
+            }
+
+            public ReadOnlySpan<char> Format(ImFormatter formatter, ReadOnlySpan<char> format = default)
+            {
+                return Type switch
+                {
+                    NumberType.Byte => formatter.Format(ValueByte, format),
+                    NumberType.Int16 => formatter.Format(ValueInt16, format),
+                    NumberType.Int32 => formatter.Format(ValueInt32, format),
+                    NumberType.Int64 => formatter.Format(ValueInt64, format),
+                    NumberType.Single => formatter.Format(ValueSingle, format),
+                    NumberType.Double => formatter.Format(ValueDouble, format),
+                    _ => throw new NotImplementedException()
+                };
+            }
+
+            public void Add(double value)
+            {
+                switch (Type)
+                {
+                    case NumberType.Byte:
+                        ValueByte += (Byte)value;
+                        break;
+                    case NumberType.Int16:
+                        ValueInt16 += (Int16)value;
+                        break;
+                    case NumberType.Int32:
+                        ValueInt32 += (Int32)value;
+                        break;
+                    case NumberType.Int64:
+                        ValueInt64 += (Int64)value;
+                        break;
+                    case NumberType.Single:
+                        ValueSingle += (Single)value;
+                        break;
+                    case NumberType.Double:
+                        ValueDouble += (Double)value;
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+
+            public void Clamp(NumberValue min, NumberValue max)
+            {
+                Clamp(ref this, in min, in max);
+            }
+
+            public static implicit operator NumberValue(Byte value) => new(value);
+            public static implicit operator NumberValue(Int16 value) => new(value);
+            public static implicit operator NumberValue(Int32 value) => new(value);
+            public static implicit operator NumberValue(Int64 value) => new(value);
+            public static implicit operator NumberValue(Single value) => new(value);
+            public static implicit operator NumberValue(Double value) => new(value);
+            
             public static bool TryParse(NumberType type, ReadOnlySpan<char> span, out NumberValue value)
             {
                 if (span.Length == 0)
@@ -507,21 +743,52 @@ namespace Imui.Controls
 
                 switch (type)
                 {
-                    case NumberType.Single:
-                        if (Single.TryParse(span, NumberStyles.Float, CultureDeutsch, out var valueSingle) ||
-                            Single.TryParse(span, NumberStyles.Float, CultureInvariant, out valueSingle))
+                    case NumberType.Byte:
+                        if (Byte.TryParse(span, INTEGER_STYLE, CultureInvariant, out var valueByte))
                         {
-                            value = new NumberValue(valueSingle);
+                            value = new NumberValue(valueByte);
+                            return true;
+                        }
+                        break;
+                    case NumberType.Int16:
+                        if (Int16.TryParse(span, INTEGER_STYLE, CultureInvariant, out var valueInt16))
+                        {
+                            value = new NumberValue(valueInt16);
                             return true;
                         }
                         break;
                     case NumberType.Int32:
-                        if (Int32.TryParse(span, NumberStyles.Integer, CultureInvariant, out var valueInt32))
+                        if (Int32.TryParse(span, INTEGER_STYLE, CultureInvariant, out var valueInt32))
                         {
                             value = new NumberValue(valueInt32);
                             return true;
                         }
                         break;
+                    case NumberType.Int64:
+                        if (Int64.TryParse(span, INTEGER_STYLE, CultureInvariant, out var valueInt64))
+                        {
+                            value = new NumberValue(valueInt64);
+                            return true;
+                        }
+                        break;
+                    case NumberType.Single:
+                        if (Single.TryParse(span, FLOAT_STYLE, CultureDeutsch, out var valueSingle) ||
+                            Single.TryParse(span, FLOAT_STYLE, CultureInvariant, out valueSingle))
+                        {
+                            value = new NumberValue(valueSingle);
+                            return true;
+                        }
+                        break;
+                    case NumberType.Double:
+                        if (Double.TryParse(span, FLOAT_STYLE, CultureDeutsch, out var valueDouble) ||
+                            Double.TryParse(span, FLOAT_STYLE, CultureInvariant, out valueDouble))
+                        {
+                            value = new NumberValue(valueDouble);
+                            return true;
+                        }
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
 
                 value = default;
@@ -534,230 +801,28 @@ namespace Imui.Controls
 
                 switch (value.Type)
                 {
+                    case NumberType.Byte:
+                        value.ValueByte = Math.Clamp(value.ValueByte, min.ValueByte, max.ValueByte);
+                        break;
+                    case NumberType.Int16:
+                        value.ValueInt16 = Math.Clamp(value.ValueInt16, min.ValueInt16, max.ValueInt16);
+                        break;
                     case NumberType.Int32:
-                        value.valueInt32 = Math.Clamp(value.valueInt32, min.valueInt32, max.valueInt32);
+                        value.ValueInt32 = Math.Clamp(value.ValueInt32, min.ValueInt32, max.ValueInt32);
+                        break;
+                    case NumberType.Int64:
+                        value.ValueInt64 = Math.Clamp(value.ValueInt64, min.ValueInt64, max.ValueInt64);
                         break;
                     case NumberType.Single:
-                        value.valueSingle = Math.Clamp(value.valueSingle, min.valueSingle, max.valueSingle);
+                        value.ValueSingle = Math.Clamp(value.ValueSingle, min.ValueSingle, max.ValueSingle);
                         break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-
-            public readonly NumberType Type;
-
-            public Int32 valueInt32;
-            public Single valueSingle;
-
-            public NumberValue(Int32 value)
-            {
-                Type = NumberType.Int32;
-                valueInt32 = value;
-                valueSingle = 0;
-            }
-
-            public NumberValue(Single value)
-            {
-                Type = NumberType.Single;
-                valueInt32 = 0;
-                valueSingle = value;
-            }
-
-            private NumberValue(NumberType type)
-            {
-                Type = type;
-                valueInt32 = 0;
-                valueSingle = 0;
-            }
-
-            public double AsDouble()
-            {
-                switch (Type)
-                {
-                    case NumberType.Int32:
-                        return valueInt32;
-                    case NumberType.Single:
-                        return valueSingle;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-            
-            public int Format(Span<char> span)
-            {
-                switch (Type)
-                {
-                    case NumberType.Int32:
-                    {
-                        return valueInt32.TryFormat(span, out var written) ? written : 0;
-                    }
-                    case NumberType.Single:
-                    {
-                        return valueSingle.TryFormat(span, out var written) ? written : 0;
-                    }
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-
-            public void Add(double value)
-            {
-                switch (Type)
-                {
-                    case NumberType.Int32:
-                        valueInt32 += (Int32)value;
-                        break;
-                    case NumberType.Single:
-                        valueSingle += (Single)value;
+                    case NumberType.Double:
+                        value.ValueDouble = Math.Clamp(value.ValueDouble, min.ValueDouble, max.ValueDouble);
                         break;
                     default:
                         throw new NotImplementedException();
                 }
             }
-
-            public void Clamp(NumberValue min, NumberValue max)
-            {
-                Clamp(ref this, in min, in max);
-            }
-
-            public static implicit operator NumberValue(Int32 value) => new(value);
-            public static implicit operator NumberValue(Single value) => new(value);
         }
-
-        // public abstract class NumericFilter<T>: ImTextEditFilter
-        // {
-        //     public override string GetFallbackString()
-        //     {
-        //         return "0";
-        //     }
-        //
-        //     public override bool IsValid(ReadOnlySpan<char> buffer)
-        //     {
-        //         return TryParse(buffer, out _);
-        //     }
-        //
-        //     public virtual bool TryParse(ReadOnlySpan<char> buffer, out T value)
-        //     {
-        //         if (buffer.IsEmpty)
-        //         {
-        //             value = default;
-        //             return true;
-        //         }
-        //
-        //         return TryParseNonEmpty(in buffer, out value);
-        //     }
-        //
-        //     public virtual bool IsInteger => true;
-        //
-        //     public abstract double AsDouble(T value);
-        //     public abstract T Add(T value0, double value1);
-        //     public abstract T Clamp(T value, T min, T max);
-        //     public abstract bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out T value);
-        //     public abstract bool TryFormat(Span<char> buffer, T value, out int length, ReadOnlySpan<char> format);
-        //
-        //     protected double Add(double value0, double value1, double min, double max)
-        //     {
-        //         var result = value0 + value1;
-        //         if (result > max)
-        //         {
-        //             result = max;
-        //         }
-        //         else if (result < min)
-        //         {
-        //             result = min;
-        //         }
-        //
-        //         return result;
-        //     }
-        // }
-        //
-        // public sealed class ByteFilter: NumericFilter<Byte>
-        // {
-        //     public override double AsDouble(byte value) => value;
-        //     public override Byte Add(Byte value0, double value1) => (Byte)Add(value0, value1, Byte.MinValue, Byte.MaxValue);
-        //     public override Byte Clamp(Byte value, Byte min, Byte max) => value > max ? max : value < min ? min : value;
-        //
-        //     public override bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out Byte value) =>
-        //         Byte.TryParse(buffer, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
-        //
-        //     public override bool TryFormat(Span<char> buffer, Byte value, out int length, ReadOnlySpan<char> format) =>
-        //         value.TryFormat(buffer, out length, format);
-        // }
-        //
-        // public sealed class Int16Filter: NumericFilter<Int16>
-        // {
-        //     public override double AsDouble(Int16 value) => value;
-        //     public override Int16 Add(Int16 value0, double value1) => (Int16)Add(value0, value1, byte.MinValue, byte.MaxValue);
-        //     public override Int16 Clamp(Int16 value, Int16 min, Int16 max) => value > max ? max : value < min ? min : value;
-        //
-        //     public override bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out Int16 value) =>
-        //         Int16.TryParse(buffer, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
-        //
-        //     public override bool TryFormat(Span<char> buffer, Int16 value, out int length, ReadOnlySpan<char> format) =>
-        //         value.TryFormat(buffer, out length, format);
-        // }
-        //
-        // public sealed class Int32Filter: NumericFilter<Int32>
-        // {
-        //     public override double AsDouble(Int32 value) => value;
-        //     public override Int32 Add(Int32 value0, double value1) => (Int32)Add(value0, value1, Int32.MinValue, Int32.MaxValue);
-        //     public override Int32 Clamp(Int32 value, Int32 min, Int32 max) => value > max ? max : value < min ? min : value;
-        //
-        //     public override bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out Int32 value) =>
-        //         Int32.TryParse(buffer, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
-        //
-        //     public override bool TryFormat(Span<char> buffer, Int32 value, out int length, ReadOnlySpan<char> format) =>
-        //         value.TryFormat(buffer, out length, format);
-        // }
-        //
-        // public sealed class Int64Filter: NumericFilter<Int64>
-        // {
-        //     public override double AsDouble(Int64 value) => value;
-        //     public override Int64 Add(Int64 value0, double value1) => (Int64)Add(value0, value1, Int64.MinValue, Int64.MaxValue);
-        //     public override Int64 Clamp(Int64 value, Int64 min, Int64 max) => value > max ? max : value < min ? min : value;
-        //
-        //     public override bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out Int64 value) =>
-        //         Int64.TryParse(buffer, NumberStyles.Integer, CultureInfo.InvariantCulture, out value);
-        //
-        //     public override bool TryFormat(Span<char> buffer, Int64 value, out int length, ReadOnlySpan<char> format) =>
-        //         value.TryFormat(buffer, out length, format);
-        // }
-        //
-        // public sealed class SingleFilter: NumericFilter<Single>
-        // {
-        //     public override bool IsInteger => false;
-        //
-        //     public override double AsDouble(Single value) => value;
-        //     public override Single Add(Single value0, double value1) => (Single)Add(value0, value1, Single.MinValue, Single.MaxValue);
-        //     public override Single Clamp(Single value, Single min, Single max) => value > max ? max : value < min ? min : value;
-        //
-        //     public override bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out Single value)
-        //     {
-        //         return Single.TryParse(buffer, NumberStyles.Float, CultureInfo.InvariantCulture, out value) ||
-        //                Single.TryParse(buffer, NumberStyles.Float, DeutschCulture, out value);
-        //     }
-        //
-        //     public override bool TryFormat(Span<char> buffer, Single value, out int length, ReadOnlySpan<char> format) =>
-        //         value.TryFormat(buffer, out length, format.IsEmpty ? "G" : format);
-        // }
-        //
-        // public sealed class DoubleFilter: NumericFilter<Double>
-        // {
-        //     public override bool IsInteger => false;
-        //
-        //     public override double AsDouble(Double value) => value;
-        //     public override Double Add(Double value0, double value1) => (Double)Add(value0, value1, Double.MinValue, Double.MaxValue);
-        //     public override Double Clamp(Double value, Double min, Double max) => value > max ? max : value < min ? min : value;
-        //
-        //     public override bool TryParseNonEmpty(in ReadOnlySpan<char> buffer, out Double value)
-        //     {
-        //         return Double.TryParse(buffer, NumberStyles.Float, CultureInfo.InvariantCulture, out value) ||
-        //                Double.TryParse(buffer, NumberStyles.Float, DeutschCulture, out value);
-        //     }
-        //
-        //     public override bool TryFormat(Span<char> buffer, Double value, out int length, ReadOnlySpan<char> format) =>
-        //         value.TryFormat(buffer, out length, format.IsEmpty ? "G" : format);
-        // }
     }
 }
