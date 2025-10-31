@@ -689,8 +689,8 @@ namespace Imui.Controls
                     NumberType.Int16 => formatter.Format(ValueInt16, format),
                     NumberType.Int32 => formatter.Format(ValueInt32, format),
                     NumberType.Int64 => formatter.Format(ValueInt64, format),
-                    NumberType.Single => formatter.Format(ValueSingle, format),
-                    NumberType.Double => formatter.Format(ValueDouble, format),
+                    NumberType.Single => formatter.Format(ValueSingle, format == default ? "G9" : format),
+                    NumberType.Double => formatter.Format(ValueDouble, format == default ? "G17" : format),
                     _ => throw new NotImplementedException()
                 };
             }
