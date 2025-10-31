@@ -21,11 +21,11 @@ namespace Imui.Controls
         public int Length => mutableLength >= 0 ? mutableLength : source.Length;
 
         public char this[Index index] => ((ReadOnlySpan<char>)this)[index];
-        
+
         private readonly ImArena arena;
         private readonly ReadOnlySpan<char> source;
         private readonly string sourceString;
-        
+
         private Span<char> mutable;
         private int mutableLength;
 
@@ -36,11 +36,11 @@ namespace Imui.Controls
             this.arena = arena;
             this.source = source;
             this.sourceString = source;
-            
+
             this.mutableLength = -1;
             this.mutable = default;
         }
-        
+
         public ImTextEditBuffer(ReadOnlySpan<char> source, ImArena arena)
         {
             this.arena = arena;
@@ -50,13 +50,13 @@ namespace Imui.Controls
             this.mutableLength = -1;
             this.mutable = default;
         }
-        
+
         public ImTextEditBuffer(Span<char> arr, int mutableLength, ImArena arena)
         {
             this.arena = arena;
             this.source = null;
             this.sourceString = null;
-            
+
             this.mutableLength = mutableLength;
             this.mutable = arr;
         }
@@ -92,9 +92,9 @@ namespace Imui.Controls
             {
                 return;
             }
-            
+
             MakeMutable(Length);
-            
+
             count = pos + count > mutableLength ? mutableLength - pos : count;
             mutable[(pos + count)..].CopyTo(mutable[pos..]);
             mutableLength -= count;
@@ -116,14 +116,14 @@ namespace Imui.Controls
             {
                 return;
             }
-            
+
             MakeMutable(Length + span.Length);
 
             if (pos != mutableLength)
             {
                 mutable[pos..mutableLength].CopyTo(mutable[(pos + span.Length)..]);
             }
-            
+
             span.CopyTo(mutable[pos..]);
             mutableLength += span.Length;
         }
@@ -139,42 +139,11 @@ namespace Imui.Controls
         }
     }
     
-    [StructLayout(LayoutKind.Sequential)]
-    public unsafe struct ImTextTempFilterBuffer
-    {
-        public const int BUFFER_LENGTH = 64;
-
-        public fixed char Buffer[BUFFER_LENGTH];
-        public byte Length;
-
-        public void Populate(ReadOnlySpan<char> buffer)
-        {
-            fixed (char* buf = Buffer)
-            {
-                var span = new Span<char>(buf, BUFFER_LENGTH);
-                var len = buffer.Length > BUFFER_LENGTH ? BUFFER_LENGTH : buffer.Length;
-
-                buffer[..len].CopyTo(span);
-                Length = (byte)len;
-            }
-        }
-
-        public ReadOnlySpan<char> AsSpan()
-        {
-            fixed (char* buf = Buffer)
-            {
-                return new Span<char>(buf, Length);
-            }
-        }
-    }
-    
     public static class ImTextEdit
     {
         public const float CARET_BLINKING_TIME = 0.3f;
         public const float MIN_WIDTH = 1;
         public const float MIN_HEIGHT = 1;
-
-        private const string TEMP_BUFFER_TAG = "temp_buffer";
 
         public static ImRect AddRect(ImGui gui, ImSize size, bool? multiline, out bool isActuallyMultiline /* wtf? */)
         {
@@ -221,55 +190,70 @@ namespace Imui.Controls
             gui.EndReadOnlyWithoutStyleChanges();
         }
 
-        public static string TextEdit(this ImGui gui, string text, ImSize size = default, bool? multiline = null, ImTextEditFilter filter = null)
+        public static string TextEdit(this ImGui gui,
+                                      string text,
+                                      ImSize size = default,
+                                      bool? multiline = null,
+                                      ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
-            TextEdit(gui, ref text, size, multiline, filter);
+            TextEdit(gui, ref text, size, multiline, keyboardType: keyboardType);
             return text;
         }
 
-        public static bool TextEdit(this ImGui gui, ref string text, ImSize size = default, bool? multiline = null, ImTextEditFilter filter = null)
+        public static bool TextEdit(this ImGui gui,
+                                    ref string text,
+                                    ImSize size = default,
+                                    bool? multiline = null,
+                                    ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
             gui.AddSpacingIfLayoutFrameNotEmpty();
 
             var rect = AddRect(gui, size, multiline, out var actuallyMultiline);
-            return TextEdit(gui, ref text, rect, actuallyMultiline, filter);
+            return TextEdit(gui, ref text, rect, actuallyMultiline, keyboardType: keyboardType);
         }
 
-        public static string TextEdit(this ImGui gui, string text, ImRect rect, bool multiline, ImTextEditFilter filter = null)
+        public static string TextEdit(this ImGui gui,
+                                      string text,
+                                      ImRect rect,
+                                      bool multiline,
+                                      ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
-            TextEdit(gui, ref text, rect, multiline, filter);
+            TextEdit(gui, ref text, rect, multiline, keyboardType: keyboardType);
             return text;
         }
 
-        public static bool TextEdit(this ImGui gui, ref string text, ImRect rect, ImTextEditFilter filter = default)
+        public static bool TextEdit(this ImGui gui,
+                                    ref string text,
+                                    ImRect rect,
+                                    ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
-            return TextEdit(gui, ref text, rect, true, filter);
+            return TextEdit(gui, ref text, rect, true, keyboardType: keyboardType);
         }
 
         public static bool TextEdit(this ImGui gui,
                                     ref string text,
                                     ImRect rect,
                                     bool multiline,
-                                    ImTextEditFilter filter = default,
-                                    ImAdjacency adjacency = ImAdjacency.None)
+                                    ImAdjacency adjacency = ImAdjacency.None,
+                                    ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
             var id = gui.GetNextControlId();
             ref var state = ref gui.Storage.Get<ImTextEditState>(id);
 
-            return TextEdit(gui, id, ref text, ref state, rect, multiline, filter, adjacency);
+            return TextEdit(gui, id, ref text, ref state, rect, multiline, adjacency, keyboardType);
         }
 
         public static bool TextEdit(this ImGui gui,
                                     ref ImTextEditBuffer buffer,
                                     ImRect rect,
                                     bool multiline,
-                                    ImTextEditFilter filter = default,
-                                    ImAdjacency adjacency = ImAdjacency.None)
+                                    ImAdjacency adjacency = ImAdjacency.None,
+                                    ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
             var id = gui.GetNextControlId();
             ref var state = ref gui.Storage.Get<ImTextEditState>(id);
 
-            return TextEdit(gui, id, ref buffer, ref state, rect, multiline, filter, adjacency);
+            return TextEdit(gui, id, ref buffer, ref state, rect, multiline, adjacency, keyboardType);
         }
 
         public static bool TextEdit(this ImGui gui,
@@ -277,12 +261,12 @@ namespace Imui.Controls
                                     ref ImTextEditBuffer buffer,
                                     ImRect rect,
                                     bool multiline,
-                                    ImTextEditFilter filter = default,
-                                    ImAdjacency adjacency = default)
+                                    ImAdjacency adjacency = default,
+                                    ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
             ref var state = ref gui.Storage.Get<ImTextEditState>(id);
 
-            return TextEdit(gui, id, ref buffer, ref state, rect, multiline, filter, adjacency);
+            return TextEdit(gui, id, ref buffer, ref state, rect, multiline, adjacency, keyboardType);
         }
 
         public static bool TextEdit(this ImGui gui,
@@ -291,11 +275,11 @@ namespace Imui.Controls
                                     ref ImTextEditState state,
                                     ImRect rect,
                                     bool multiline,
-                                    ImTextEditFilter filter = default,
-                                    ImAdjacency adjacency = default)
+                                    ImAdjacency adjacency = default,
+                                    ImTouchKeyboardType keyboardType = ImTouchKeyboardType.Default)
         {
             var buffer = new ImTextEditBuffer(text, gui.Arena);
-            var changed = TextEdit(gui, id, ref buffer, ref state, rect, multiline, filter, adjacency);
+            var changed = TextEdit(gui, id, ref buffer, ref state, rect, multiline, adjacency, keyboardType);
             if (changed)
             {
                 text = buffer.ToString();
@@ -310,8 +294,8 @@ namespace Imui.Controls
                                            ref ImTextEditState state,
                                            ImRect rect,
                                            bool multiline,
-                                           ImTextEditFilter filter,
-                                           ImAdjacency adjacency)
+                                           ImAdjacency adjacency,
+                                           ImTouchKeyboardType keyboardType)
         {
             ref readonly var style = ref gui.Style.TextEdit;
 
@@ -320,24 +304,6 @@ namespace Imui.Controls
             var stateStyle = selected ? style.Selected : style.Normal;
             var textChanged = false;
             var editable = !gui.IsReadOnly;
-
-            ImTextTempFilterBuffer* tempBuffer = null;
-
-            if (filter != null && !filter.IsValid(buffer))
-            {
-                var fallbackString = filter.GetFallbackString();
-                buffer.Clear(fallbackString.Length);
-                buffer.Insert(0, fallbackString);
-                textChanged = true;
-            }
-
-            if (selected && filter != null)
-            {
-                tempBuffer = GetTempFilterBuffer(gui, id);
-
-                buffer.Clear(tempBuffer->Length);
-                buffer.Insert(0, tempBuffer->AsSpan());
-            }
 
             gui.Box(rect, stateStyle.Box.MakeAdjacent(adjacency));
 
@@ -357,8 +323,14 @@ namespace Imui.Controls
 
             var textRect = rect.WithPadding(textPadding);
             var layout = gui.TextDrawer.BuildTempLayout(
-                buffer, textRect.W, textRect.H, textAlignment.X, textAlignment.Y, textSize,
-                style.TextWrap, ImTextOverflow.Overflow);
+                buffer,
+                textRect.W,
+                textRect.H,
+                textAlignment.X,
+                textAlignment.Y,
+                textSize,
+                style.TextWrap,
+                ImTextOverflow.Overflow);
 
             gui.Canvas.PushRectMask(rect, stateStyle.Box.BorderRadius);
             gui.Layout.Push(ImAxis.Vertical, textRect, ImLayoutFlag.Root);
@@ -392,11 +364,6 @@ namespace Imui.Controls
                     if (!selected)
                     {
                         gui.SetActiveControl(id, ImControlFlag.Draggable);
-
-                        if (filter != null)
-                        {
-                            GetTempFilterBuffer(gui, id)->Populate(buffer);
-                        }
                     }
 
                     state.Selection = 0;
@@ -470,8 +437,8 @@ namespace Imui.Controls
                             var settings = new ImTouchKeyboardSettings()
                             {
                                 Muiltiline = multiline,
-                                Type = filter?.KeyboardType ?? ImTouchKeyboardType.Default,
-                                CharactersLimit = filter == null ? 0 : ImTextTempFilterBuffer.BUFFER_LENGTH,
+                                Type = keyboardType,
+                                CharactersLimit = 0, // TODO (artem-s): allow to control this
                                 Selection = new RangeInt(begin, end - begin)
                             };
 
@@ -486,17 +453,7 @@ namespace Imui.Controls
             gui.EndScrollable(multiline ? ImScrollFlag.None : ImScrollFlag.HideHorBar | ImScrollFlag.HideVerBar);
             gui.Layout.Pop();
             gui.Canvas.PopRectMask();
-
-            if (filter != null && !filter.IsValid(buffer))
-            {
-                textChanged = false;
-            }
-
-            if (tempBuffer != null)
-            {
-                tempBuffer->Populate(buffer);
-            }
-
+            
             return textChanged;
         }
 
@@ -556,7 +513,7 @@ namespace Imui.Controls
                             state.Caret = buffer.Length;
                             stateChanged = true;
                             break;
-                        
+
                         case ImKeyboardCommandFlag.Cut:
                             gui.Input.Clipboard = new string(GetSelectedText(in state, in buffer));
                             if (editable)
@@ -1040,23 +997,5 @@ namespace Imui.Controls
                 gui.Canvas.Rect(lineSelectionRect, style.SelectionColor);
             }
         }
-
-        public static unsafe ImTextTempFilterBuffer* GetTempFilterBuffer(ImGui gui, uint id)
-        {
-            gui.PushId(id);
-            var tempBufferId = gui.GetControlId(TEMP_BUFFER_TAG);
-            var tempBuffer = gui.Storage.GetUnsafe<ImTextTempFilterBuffer>(tempBufferId);
-            gui.PopId();
-
-            return tempBuffer;
-        }
-    }
-
-    public abstract class ImTextEditFilter
-    {
-        public virtual ImTouchKeyboardType KeyboardType => ImTouchKeyboardType.Default;
-
-        public abstract bool IsValid(ReadOnlySpan<char> buffer);
-        public abstract string GetFallbackString();
     }
 }
