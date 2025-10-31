@@ -111,7 +111,7 @@ namespace Imui.Controls
             var rect = ImTextEdit.AddRect(gui, size, false, out _);
             return NumericEdit(gui, ref value, rect, format, step, min, max, flags);
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NumericEdit(ImGui gui,
                                        ref byte value,
@@ -123,7 +123,7 @@ namespace Imui.Controls
                                        ImNumericEditFlag flags = default)
         {
             var id = gui.GetNextControlId();
-            
+
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
@@ -138,7 +138,7 @@ namespace Imui.Controls
                                        ImNumericEditFlag flags = default)
         {
             var id = gui.GetNextControlId();
-            
+
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
@@ -153,7 +153,7 @@ namespace Imui.Controls
                                        ImNumericEditFlag flags = default)
         {
             var id = gui.GetNextControlId();
-            
+
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
@@ -168,7 +168,7 @@ namespace Imui.Controls
                                        ImNumericEditFlag flags = default)
         {
             var id = gui.GetNextControlId();
-            
+
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
@@ -183,7 +183,7 @@ namespace Imui.Controls
                                        ImNumericEditFlag flags = default)
         {
             var id = gui.GetNextControlId();
-            
+
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
@@ -198,7 +198,7 @@ namespace Imui.Controls
                                        ImNumericEditFlag flags = default)
         {
             var id = gui.GetNextControlId();
-            
+
             return NumericEdit(gui, id, ref value, rect, format, step, min, max, flags);
         }
 
@@ -564,13 +564,14 @@ namespace Imui.Controls
                     count = str.Length;
                 }
             }
-            
+
             public static implicit operator ReadOnlySpan<char>(EditBuffer buffer)
             {
                 return new ReadOnlySpan<char>(buffer.fixedBuffer, buffer.count);
             }
         }
 
+        // (artem-s): if only we could generalize working with numbers... Oh, we can! But not in Unity with their shit-tier support for new c# features
         public struct NumberValue
         {
             // (artem-s): allow using comma as a decimal separator
@@ -579,7 +580,7 @@ namespace Imui.Controls
 
             private const NumberStyles INTEGER_STYLE = NumberStyles.Integer | NumberStyles.AllowExponent;
             private const NumberStyles FLOAT_STYLE = NumberStyles.Float;
-            
+
             public readonly NumberType Type;
 
             public Byte ValueByte;
@@ -599,7 +600,7 @@ namespace Imui.Controls
                 ValueSingle = 0;
                 ValueDouble = 0;
             }
-            
+
             public NumberValue(Int16 value)
             {
                 Type = NumberType.Int16;
@@ -610,7 +611,7 @@ namespace Imui.Controls
                 ValueSingle = 0;
                 ValueDouble = 0;
             }
-            
+
             public NumberValue(Int32 value)
             {
                 Type = NumberType.Int32;
@@ -621,7 +622,7 @@ namespace Imui.Controls
                 ValueSingle = 0;
                 ValueDouble = 0;
             }
-            
+
             public NumberValue(Int64 value)
             {
                 Type = NumberType.Int64;
@@ -632,7 +633,7 @@ namespace Imui.Controls
                 ValueSingle = 0;
                 ValueDouble = 0;
             }
-            
+
             public NumberValue(Single value)
             {
                 Type = NumberType.Single;
@@ -643,7 +644,7 @@ namespace Imui.Controls
                 ValueSingle = value;
                 ValueDouble = 0;
             }
-            
+
             public NumberValue(Double value)
             {
                 Type = NumberType.Double;
@@ -694,28 +695,102 @@ namespace Imui.Controls
                 };
             }
 
-            public void Add(double value)
+            public void Add(Double value)
             {
                 switch (Type)
                 {
                     case NumberType.Byte:
-                        ValueByte += (Byte)value;
+                    {
+                        Int32 result = ValueByte + (Int32)value;
+                        if (result > Byte.MaxValue)
+                        {
+                            result = Byte.MaxValue;
+                        }
+                        else if (result < Byte.MinValue)
+                        {
+                            result = Byte.MinValue;
+                        }
+                        ValueByte = (Byte)result;
                         break;
+                    }
                     case NumberType.Int16:
-                        ValueInt16 += (Int16)value;
+                    {
+                        Int32 result = ValueInt16 + (Int32)value;
+                        if (result > Int16.MaxValue)
+                        {
+                            result = Int16.MaxValue;
+                        }
+                        else if (result < Int16.MinValue)
+                        {
+                            result = Int16.MinValue;
+                        }
+                        ValueInt16 = (Int16)result;
                         break;
+                    }
                     case NumberType.Int32:
-                        ValueInt32 += (Int32)value;
+                    {
+                        Int64 result = (Int64)ValueInt32 + (Int64)value;
+                        if (result > Int32.MaxValue)
+                        {
+                            result = Int32.MaxValue;
+                        }
+                        else if (result < Int32.MinValue)
+                        {
+                            result = Int32.MinValue;
+                        }
+                        ValueInt32 = (Int32)result;
                         break;
+                    }
                     case NumberType.Int64:
-                        ValueInt64 += (Int64)value;
+                    {
+                        if (value > 0 && ValueInt64 > Int64.MaxValue - (Int64)value)
+                        {
+                            ValueInt64 = Int64.MaxValue;
+                        }
+                        else if (value < 0 && ValueInt64 < Int64.MinValue - (Int64)value)
+                        {
+                            ValueInt64 = Int64.MinValue;
+                        }
+                        else
+                        {
+                            ValueInt64 += (Int64)value;
+                        }
                         break;
+                    }
                     case NumberType.Single:
-                        ValueSingle += (Single)value;
+                    {
+                        Double result = (Double)ValueSingle + value;
+                        if (Double.IsPositiveInfinity(result))
+                        {
+                            ValueSingle = Single.MaxValue;
+                        }
+                        else if (Double.IsNegativeInfinity(result))
+                        {
+                            ValueSingle = Single.MinValue;
+                        }
+                        else
+                        {
+                            ValueSingle = (Single)result;
+                        }
                         break;
+                    }
                     case NumberType.Double:
-                        ValueDouble += (Double)value;
+                    {
+                        Double result = ValueDouble + value;
+                        if (Double.IsPositiveInfinity(result))
+                        {
+                            ValueDouble = Double.MaxValue;
+                        }
+                        else if (Double.IsNegativeInfinity(result))
+                        {
+                            ValueDouble = Double.MinValue;
+                        }
+                        else
+                        {
+                            ValueDouble = result;
+                        }
                         break;
+                    }
                     default:
                         throw new NotImplementedException();
                 }
@@ -732,7 +807,7 @@ namespace Imui.Controls
             public static implicit operator NumberValue(Int64 value) => new(value);
             public static implicit operator NumberValue(Single value) => new(value);
             public static implicit operator NumberValue(Double value) => new(value);
-            
+
             public static bool TryParse(NumberType type, ReadOnlySpan<char> span, out NumberValue value)
             {
                 if (span.Length == 0)
