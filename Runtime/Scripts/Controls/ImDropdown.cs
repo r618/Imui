@@ -224,7 +224,7 @@ namespace Imui.Controls
             switch (preview)
             {
                 case ImDropdownPreviewType.Text:
-                    gui.TextEditReadonly(label, previewRect, false, ImAdjacency.Left);
+                    gui.TextEditNonEditable(label, previewRect, false, ImAdjacency.Left);
                     break;
                 case ImDropdownPreviewType.Default:
                     using (gui.StyleScope(ref gui.Style.Button, in gui.Style.Dropdown.Button))

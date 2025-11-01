@@ -8,43 +8,85 @@ namespace Imui.IO.Utility
     public enum ImKeyboardCommandFlag: uint
     {
         None = 0,
-        Selection = 1 << 0,
-        NextWord = 1 << 1,
+        Select = 1 << 0,
+        JumpWord = 1 << 1,
         SelectAll = 1 << 2,
         Copy = 1 << 3,
         Paste = 1 << 4,
-        Cut = 1 << 5
+        Cut = 1 << 5,
+        JumpEnd = 1 << 6
     }
-    
+
     public static class ImKeyboardCommandsHelper
     {
         public static bool TryGetCommand(ImKeyboardEvent evt, out ImKeyboardCommandFlag command)
         {
-            command = ImKeyboardCommandFlag.None;
+            return SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX
+                ? TryGetCommandMacOS(evt, out command)
+                : TryGetCommandGeneric(evt, out command);
+        }
+
+        public static bool TryGetCommandMacOS(ImKeyboardEvent evt, out ImKeyboardCommandFlag result)
+        {
+            result = ImKeyboardCommandFlag.None;
             
             var arrow = (int)evt.Key >= 273 && (int)evt.Key <= 276;
-            bool jump;
-            bool control;
+            var option = evt.Modifiers.HasFlag(EventModifiers.Alt); // option key
+            var command = evt.Modifiers.HasFlag(EventModifiers.Command);
+            var shift = evt.Modifiers.HasFlag(EventModifiers.Shift);
 
-            if (SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX)
+            if (arrow && command && !option)
             {
-                jump = evt.Modifiers.HasFlag(EventModifiers.Alt); // option key
-                control = evt.Modifiers.HasFlag(EventModifiers.Command);
+                result |= ImKeyboardCommandFlag.JumpEnd;
             }
-            else
+            else if (arrow && !command && option)
             {
-                jump = evt.Modifiers.HasFlag(EventModifiers.Control);
-                control = evt.Modifiers.HasFlag(EventModifiers.Control);
+                result |= ImKeyboardCommandFlag.JumpWord;
             }
+
+            if (arrow && shift)
+            {
+                result |= ImKeyboardCommandFlag.Select;
+            }
+
+            if (command && evt.Key == KeyCode.A)
+            {
+                result |= ImKeyboardCommandFlag.SelectAll;
+            }
+
+            if (command && evt.Key == KeyCode.C)
+            {
+                result |= ImKeyboardCommandFlag.Copy;
+            }
+            
+            if (command && evt.Key == KeyCode.V)
+            {
+                result |= ImKeyboardCommandFlag.Paste;
+            }
+
+            if (command && evt.Key == KeyCode.X)
+            {
+                result |= ImKeyboardCommandFlag.Cut;
+            }
+
+            return result != ImKeyboardCommandFlag.None;
+        }
+
+        public static bool TryGetCommandGeneric(ImKeyboardEvent evt, out ImKeyboardCommandFlag command)
+        {
+            command = ImKeyboardCommandFlag.None;
+
+            var arrow = (int)evt.Key >= 273 && (int)evt.Key <= 276;
+            var control = evt.Modifiers.HasFlag(EventModifiers.Control);
 
             if (arrow && evt.Modifiers.HasFlag(EventModifiers.Shift))
             {
-                command |= ImKeyboardCommandFlag.Selection;
+                command |= ImKeyboardCommandFlag.Select;
             }
-
-            if (arrow && jump)
+            
+            if (arrow && control)
             {
-                command |= ImKeyboardCommandFlag.NextWord;
+                command |= ImKeyboardCommandFlag.JumpWord;
             }
 
             if (control && evt.Key == KeyCode.A)

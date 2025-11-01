@@ -199,7 +199,7 @@ namespace Imui.Examples
             gui.EndHorizontal();
 
             var wholeMessageSpan = gui.Formatter.Concat(selectedMessage.Text, "\n", selectedMessage.Stacktrace);
-            gui.TextEditReadonly(wholeMessageSpan, gui.AddLayoutRect(gui.GetLayoutSize()), multiline: true);
+            gui.TextEditNonEditable(wholeMessageSpan, gui.AddLayoutRect(gui.GetLayoutSize()), multiline: true);
             gui.Layout.Pop();
         }
 

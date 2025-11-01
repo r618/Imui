@@ -14,7 +14,8 @@ namespace Imui.Controls
         HideHorBar = 1 << 1,
         PersistentHorBar = 1 << 2,
         PersistentVerBar = 1 << 3,
-        DisableInertia = 1 << 4
+        DisableInertia = 1 << 4,
+        HideAll = HideVerBar | HideHorBar
     }
 
     [Flags]

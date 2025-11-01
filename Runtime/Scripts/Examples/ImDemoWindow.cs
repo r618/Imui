@@ -94,6 +94,7 @@ namespace Imui.Examples
         private static Vector4 vec4 = new Vector4(1.0f, 2.0f, 3.0f, 4.0f);
         private static Vector2Int vec2int = new Vector2Int(1, 2);
         private static Vector3Int vec3int = new Vector3Int(1, 2, 3);
+        private static bool textEditWrap;
 
         private static bool selectMultipleValues = false;
         private static HashSet<string> selectedNodes = new HashSet<string>(8);
@@ -236,7 +237,11 @@ namespace Imui.Examples
             }
             gui.Separator("Text editors");
             gui.TextEdit(ref singleLineText, multiline: false);
-            gui.TextEdit(ref multiLineText, multiline: true);
+            gui.Checkbox(ref textEditWrap, "Wrap Text");
+            using (gui.StyleScope(ref gui.Style.TextEdit.TextWrap, textEditWrap))
+            {
+                gui.TextEdit(ref multiLineText, multiline: true);
+            }
             gui.Separator("Sliders (with tooltips)");
             DrawSlidersDemo(gui);
             gui.Separator("Selection list (you can select multiple values)");

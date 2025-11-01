@@ -102,33 +102,39 @@ namespace Imui.Core
             return span;
         }
 
-        public Span<char> Format(float value, ReadOnlySpan<char> format = default)
+        public ReadOnlySpan<char> Format(long value, ReadOnlySpan<char> format = default)
         {
-            const int MAX_LEN = 64;
-
-            var span = arena.AllocArray<char>(format.IsEmpty || format.Length < MAX_LEN ? MAX_LEN : format.Length);
-            value.TryFormat(span, out var written, format);
-            return span[..written];
+            var span = arena.AllocArray<char>(512);
+            if (value.TryFormat(span, out var written, format))
+            {
+                return arena.ReallocArray(ref span, written);
+            }
+            
+            return ReadOnlySpan<char>.Empty;
+        }
+        
+        public ReadOnlySpan<char> Format(ulong value, ReadOnlySpan<char> format = default)
+        {
+            var span = arena.AllocArray<char>(512);
+            if (value.TryFormat(span, out var written, format))
+            {
+                return arena.ReallocArray(ref span, written);
+            }
+            
+            return ReadOnlySpan<char>.Empty;
         }
 
-        public Span<char> Format(int value, ReadOnlySpan<char> format = default)
+        public ReadOnlySpan<char> Format(double value, ReadOnlySpan<char> format = default)
         {
-            const int MAX_LEN = 11;
-
-            var span = arena.AllocArray<char>(format.IsEmpty || format.Length < MAX_LEN ? MAX_LEN : format.Length);
-            value.TryFormat(span, out var written, format);
-            return span[..written];
+            var span = arena.AllocArray<char>(512);
+            if (value.TryFormat(span, out var written, format))
+            {
+                return arena.ReallocArray(ref span, written);
+            }
+            
+            return ReadOnlySpan<char>.Empty;
         }
-
-        public Span<char> Format(uint value, ReadOnlySpan<char> format = default)
-        {
-            const int MAX_LEN = 10;
-
-            var span = arena.AllocArray<char>(format.IsEmpty || format.Length < MAX_LEN ? MAX_LEN : format.Length);
-            value.TryFormat(span, out var written, format);
-            return span[..written];
-        }
-
+        
         public Span<char> FormatEnum<TEnum>(TEnum value) where TEnum: struct, Enum
         {
             const string SEPARATOR = ImEnumUtility<TEnum>.FLAGS_SEPARATOR;

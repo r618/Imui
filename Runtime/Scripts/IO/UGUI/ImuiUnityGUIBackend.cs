@@ -6,6 +6,7 @@ using Imui.IO.Touch;
 using Imui.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
@@ -41,6 +42,7 @@ namespace Imui.IO.UGUI
         public bool WasMouseDownThisFrame { get; private set; }
 
         public Vector2 MousePosition => mousePosition;
+        public double Time => time;
         public ref readonly ImMouseEvent MouseEvent => ref mouseEvent;
         public ref readonly ImTextEvent TextEvent => ref textEvent;
         public int KeyboardEventsCount => keyboardEvents.Count;
@@ -74,6 +76,7 @@ namespace Imui.IO.UGUI
         private ImTextEvent textEvent;
         private ImTouchKeyboard touchKeyboardHandler;
         private bool elementHovered;
+        private double time;
 
         private bool mouseHeldDown;
         private ImMouseDevice mouseDownDevice;
@@ -210,14 +213,15 @@ namespace Imui.IO.UGUI
             var mouseBtnLeft = (int)PointerEventData.InputButton.Left;
 
             mousePosition = GetMousePosition();
+            time = UnityEngine.Time.unscaledTimeAsDouble;
 
             if (mouseEventsQueue.TryPopBack(out var queuedMouseEvent))
             {
                 mouseEvent = queuedMouseEvent;
             }
-            else if (mouseHeldDown && (Time.unscaledTime - mouseDownTime[mouseBtnLeft]) > HELD_DOWN_DELAY)
+            else if (mouseHeldDown && (UnityEngine.Time.unscaledTime - mouseDownTime[mouseBtnLeft]) > HELD_DOWN_DELAY)
             {
-                var delta = new Vector2(Time.unscaledTime - mouseDownTime[mouseBtnLeft], 0);
+                var delta = new Vector2(UnityEngine.Time.unscaledTime - mouseDownTime[mouseBtnLeft], 0);
                 var count = mouseDownCount[mouseBtnLeft];
 
                 mouseEvent = new ImMouseEvent(ImMouseEventType.Hold, mouseBtnLeft, EventModifiers.None, delta, mouseDownDevice, count);
@@ -298,14 +302,14 @@ namespace Imui.IO.UGUI
             var btn = (int)eventData.button;
             var pos = GetMousePosition();
 
-            if (Time.unscaledTime - mouseDownTime[btn] >= MULTI_CLICK_TIME_THRESHOLD || (pos - mouseDownPos[btn]).magnitude >= MULTI_CLICK_POS_THRESHOLD)
+            if (UnityEngine.Time.unscaledTime - mouseDownTime[btn] >= MULTI_CLICK_TIME_THRESHOLD || (pos - mouseDownPos[btn]).magnitude >= MULTI_CLICK_POS_THRESHOLD)
             {
                 mouseDownCount[btn] = 0;
             }
 
             mouseDownPos[btn] = pos;
             mouseDownCount[btn] += 1;
-            mouseDownTime[btn] = Time.unscaledTime;
+            mouseDownTime[btn] = UnityEngine.Time.unscaledTime;
             possibleClick[btn] = true;
             mouseDownDevice = device;
 
