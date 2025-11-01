@@ -437,8 +437,7 @@ namespace Imui.Controls
                         break;
                     case ImTextEventType.Set:
                         textChanged = buffer.Length != 0 || textEvent.Text.Length != 0;
-                        buffer.Clear(textEvent.Text.Length);
-                        Insert(ref state, ref buffer, textEvent.Text);
+                        Set(ref state, ref buffer, textEvent.Text);
                         if (textEvent.Selection != null)
                         {
                             state.Caret = textEvent.Selection.Value.start;
@@ -449,10 +448,7 @@ namespace Imui.Controls
                     case ImTextEventType.Submit:
                         gui.ResetActiveControl();
                         textChanged = buffer.Length != 0 || textEvent.Text.Length != 0;
-                        buffer.Clear(textEvent.Text.Length);
-                        state.Caret = 0;
-                        state.Selection = 0;
-                        Insert(ref state, ref buffer, textEvent.Text);
+                        Set(ref state, ref buffer, textEvent.Text);
                         gui.Input.UseTextEvent();
                         break;
                     default:
@@ -624,6 +620,14 @@ namespace Imui.Controls
             var added = buffer.Insert(state.Caret, text);
             state.Caret += added;
             return added > 0;
+        }
+
+        public static void Set(ref ImTextEditState state, ref ImTextEditBuffer buffer, ReadOnlySpan<char> text)
+        {
+            buffer.Clear(text.Length);
+            state.Caret = text.Length;
+            state.Selection = 0;
+            buffer.Insert(0, text);
         }
 
         public static bool DeleteSelection(ref ImTextEditState state, ref ImTextEditBuffer buffer)
