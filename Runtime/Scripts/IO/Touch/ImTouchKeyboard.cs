@@ -120,7 +120,7 @@ namespace Imui.IO.Touch
             switch (type)
             {
                 case ImTouchKeyboardType.Numeric:
-                    return TouchScreenKeyboardType.DecimalPad;
+                    return TouchScreenKeyboardType.NumbersAndPunctuation;
                 default:
                     return TouchScreenKeyboardType.Default;
             }
