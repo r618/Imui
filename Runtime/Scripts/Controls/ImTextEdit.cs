@@ -13,6 +13,7 @@ namespace Imui.Controls
     {
         public int Caret;
         public int Selection;
+        public double BlinkTime;
     }
     
     public ref struct ImTextEditBuffer
@@ -156,7 +157,8 @@ namespace Imui.Controls
 
     public static class ImTextEdit
     {
-        public const float CARET_BLINKING_TIME = 0.3f;
+        public const float CARET_BLINKING_TIME = 0.25f;
+        public const float NO_BLINK_COOLDOWN = CARET_BLINKING_TIME;
 
         public static ImRect AddRect(ImGui gui, ImSize size, bool? multiline, out bool isActuallyMultiline /* wtf? */)
         {
@@ -374,6 +376,7 @@ namespace Imui.Controls
                 case ImMouseEventType.Down when evt.LeftButton && selected && hovered && evt.Count > 1:
                     state.Selection = 0;
                     state.Caret = ViewToCaretPosition(gui.Input.MousePosition, gui.TextDrawer, textRect, in layout, in buffer);
+                    state.BlinkTime = gui.Input.Time;
 
                     if (evt.Count == 2)
                     {
@@ -395,6 +398,7 @@ namespace Imui.Controls
 
                     state.Selection = 0;
                     state.Caret = ViewToCaretPosition(gui.Input.MousePosition, gui.TextDrawer, textRect, in layout, in buffer);
+                    state.BlinkTime = gui.Input.Time;
 
                     gui.Input.UseMouseEvent();
                     break;
@@ -403,6 +407,7 @@ namespace Imui.Controls
                     var newCaretPosition = ViewToCaretPosition(gui.Input.MousePosition, gui.TextDrawer, textRect, in layout, in buffer);
                     state.Selection -= newCaretPosition - state.Caret;
                     state.Caret = newCaretPosition;
+                    state.BlinkTime = gui.Input.Time;
 
                     gui.Input.UseMouseEvent();
                     ScrollToCaret(gui, state, textRect, in layout, buffer);
@@ -415,7 +420,7 @@ namespace Imui.Controls
 
             if (selected)
             {
-                DrawCaret(gui, state.Caret, textRect, in layout, in stateStyle, in buffer);
+                DrawCaret(gui, state.Caret, state.BlinkTime, textRect, in layout, in stateStyle, in buffer);
                 DrawSelection(gui, state.Caret, state.Selection, textRect, in layout, in stateStyle, in buffer);
 
                 for (int i = 0; i < gui.Input.KeyboardEventsCount; ++i)
@@ -425,7 +430,7 @@ namespace Imui.Controls
                     if (HandleKeyboardEvent(gui, in keyboardEvent, ref state, ref buffer, textRect, in layout, multiline, editable, out var isTextChanged))
                     {
                         textChanged |= isTextChanged;
-
+                        state.BlinkTime = gui.Input.Time;
                         gui.Input.UseKeyboardEvent(i);
                         ScrollToCaret(gui, state, textRect, in layout, buffer);
                     }
@@ -487,6 +492,7 @@ namespace Imui.Controls
             ref var state = ref gui.Storage.Get<ImTextEditState>(id);
             state.Caret = text.Length;
             state.Selection = -text.Length;
+            state.BlinkTime = gui.Input.Time;
         }
 
         public static bool HandleKeyboardEvent(ImGui gui,
@@ -1019,6 +1025,7 @@ namespace Imui.Controls
 
         public static void DrawCaret(ImGui gui,
                                      int position,
+                                     double blinkTime,
                                      ImRect textRect,
                                      in ImTextLayout layout,
                                      in ImStyleTextEditState style,
@@ -1027,7 +1034,8 @@ namespace Imui.Controls
             var viewPosition = CaretToViewPosition(position, gui.TextDrawer, textRect, in layout, in buffer);
             var caretViewRect = new ImRect(viewPosition.x, viewPosition.y - layout.LineHeight, gui.Style.TextEdit.CaretWidth, layout.LineHeight);
 
-            if ((long)(Time.unscaledTime / CARET_BLINKING_TIME) % 2 == 0)
+            var draw = ((long)(Math.Max(0, gui.Input.Time - blinkTime - NO_BLINK_COOLDOWN) / CARET_BLINKING_TIME)) % 2 == 0;
+            if (draw)
             {
                 gui.Canvas.Rect(caretViewRect, style.Box.FrontColor);
             }

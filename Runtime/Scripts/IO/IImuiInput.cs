@@ -16,6 +16,7 @@ namespace Imui.IO
         }
 
         Vector2 MousePosition { get; }
+        double Time { get; }
 
         bool WasMouseDownThisFrame { get; }
 
