@@ -381,8 +381,8 @@ namespace Imui.Controls
             gui.PopId();
 
             var textBuffer = active
-                ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena)
-                : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena);
+                ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena, EditBuffer.BUFFER_LENGTH)
+                : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena, 0);
 
             var adjacency = usePlusMinusButtons ? ImAdjacency.Left : ImAdjacency.None;
             if ((flags & ImNumericEditFlag.RightAdjacent) != 0)
@@ -435,7 +435,7 @@ namespace Imui.Controls
             }
             else
             {
-                changed = gui.TextEdit(id, ref textBuffer, rect, false, adjacency, ImTouchKeyboardType.Numeric);
+                changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric, adjacency);
             }
 
             var justActivated = !active && gui.IsControlActive(id);
@@ -559,10 +559,12 @@ namespace Imui.Controls
 
             public void Populate(ReadOnlySpan<char> str)
             {
+                var stringToCopy = str[..Math.Min(BUFFER_LENGTH, str.Length)];
+                
                 fixed (char* buf = fixedBuffer)
                 {
-                    str.CopyTo(new Span<char>(buf, BUFFER_LENGTH));
-                    count = str.Length;
+                    stringToCopy.CopyTo(new Span<char>(buf, BUFFER_LENGTH));
+                    count = stringToCopy.Length;
                 }
             }
 

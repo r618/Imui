@@ -2,6 +2,7 @@ using System;
 
 namespace Imui.Style
 {
+    // (artem-s): this was a bad idea, I should probably get rid of it
     [Flags]
     public enum ImAdjacency
     {
