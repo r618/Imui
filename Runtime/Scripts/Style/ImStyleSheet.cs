@@ -2,11 +2,15 @@ using System;
 
 namespace Imui.Style
 {
+    public struct ImStyleGlobal
+    {
+        public float ReadOnlyModifier;
+    }
+    
     [Serializable]
     public struct ImStyleSheet
     {
-        public ImTheme Theme;
-        public ImPalette Palette;
+        public ImStyleGlobal Global;
         public ImStyleLayout Layout;
         public ImStyleWindow Window;
         public ImStyleText Text;
