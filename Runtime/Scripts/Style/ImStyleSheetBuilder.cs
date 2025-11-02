@@ -129,7 +129,7 @@ namespace Imui.Style
 
             sheet.Window.ContentPadding = theme.Spacing;
 
-            sheet.Window.ResizeHandleNormalColor = palette.Back.ToBorder(ctx);
+            sheet.Window.ResizeHandleNormalColor = palette.Back.ToBorder(ctx).WithAlpha(0.25f);
             sheet.Window.ResizeHandleActiveColor = palette.Accent;
             sheet.Window.ResizeHandleSize = Mathf.Max(theme.BorderRadius * 2.0f, (theme.TextSize + theme.ExtraRowHeight) * 1.25f);
 
@@ -157,7 +157,7 @@ namespace Imui.Style
 
             // text edit
 
-            sheet.TextEdit.Normal.SelectionColor = palette.Accent.WithAlpha(0.25f);
+            sheet.TextEdit.Normal.SelectionColor = palette.Accent.EnsureLightnessDistance(sheet.Window.Box.BackColor).WithAlpha(0.4f);
             sheet.TextEdit.Normal.Box.BackColor = palette.Control;
             sheet.TextEdit.Normal.Box.FrontColor = palette.Front;
             sheet.TextEdit.Normal.Box.BorderColor = palette.Control.ToBorder(ctx);
@@ -167,7 +167,7 @@ namespace Imui.Style
             sheet.TextEdit.Selected.SelectionColor = sheet.TextEdit.Normal.SelectionColor;
             sheet.TextEdit.Selected.Box.BackColor = palette.Control.ToHovered(ctx);
             sheet.TextEdit.Selected.Box.FrontColor = palette.Front;
-            sheet.TextEdit.Selected.Box.BorderColor = palette.Accent;
+            sheet.TextEdit.Selected.Box.BorderColor = palette.Accent.EnsureLightnessDistance(sheet.Window.Box.BackColor);
             sheet.TextEdit.Selected.Box.BorderRadius = theme.BorderRadius / 2.0f;
             sheet.TextEdit.Selected.Box.BorderThickness = theme.BorderThickness;
 
@@ -260,7 +260,7 @@ namespace Imui.Style
             sheet.Slider.Handle.Normal.BorderColor = palette.Control.Ascend(ctx).ToBorder(ctx);
 
             sheet.Slider.Handle.Hovered = sheet.Slider.Handle.Normal;
-            sheet.Slider.Handle.Hovered.BorderColor = palette.Accent;
+            sheet.Slider.Handle.Hovered.BorderColor = palette.Accent.EnsureLightnessDistance(sheet.Window.Box.BackColor);
 
             sheet.Slider.Handle.Pressed = sheet.Radiobox.Checked.Pressed;
 
@@ -321,10 +321,13 @@ namespace Imui.Style
 
             sheet.Tree.ArrowScale = 0.6f;
             sheet.Tree.ItemNormal = sheet.List.ItemNormal;
+            sheet.Tree.ItemNormal.BorderRadius = sheet.Button.BorderRadius;
             sheet.Tree.ItemNormal.Normal.BackColor = default;
             sheet.Tree.ItemSelected = sheet.List.ItemSelected;
+            sheet.Tree.ItemSelected.BorderRadius = sheet.Button.BorderRadius;
 
             // dropdown
+            
             sheet.Dropdown.ArrowScale = 0.6f;
             sheet.Dropdown.Button = sheet.Button;
             sheet.Dropdown.Button.Alignment = new ImAlignment(0.0f, 0.5f);
@@ -376,13 +379,14 @@ namespace Imui.Style
             sheet.MenuBar.ItemNormal.Alignment = new ImAlignment(0.5f, 0.5f);
             sheet.MenuBar.ItemNormal.BorderRadius = 0.0f;
             sheet.MenuBar.ItemNormal.BorderThickness = 0.0f;
+            sheet.MenuBar.ItemNormal.Overflow = ImTextOverflow.Overflow;
             sheet.MenuBar.ItemActive = sheet.Menu.ItemActive;
             sheet.MenuBar.ItemActive.BorderRadius = 0.0f;
             sheet.MenuBar.ItemActive.BorderThickness = 0.0f;
             sheet.MenuBar.ItemActive.Alignment = new ImAlignment(0.5f, 0.5f);
             sheet.MenuBar.ItemActive.Normal.BackColor.SetAlpha(1.0f);
-
-
+            sheet.MenuBar.ItemActive.Overflow = ImTextOverflow.Overflow;
+            
             // color picker
 
             sheet.ColorPicker.BorderColor = palette.Control.ToBorder(ctx);

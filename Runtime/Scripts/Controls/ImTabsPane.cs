@@ -147,8 +147,8 @@ namespace Imui.Controls
         {
             var rect = button.TakeBottom(gui.Style.Button.BorderThickness + gui.Style.Tabs.ContainerBox.BorderThickness);
 
-            rect.Y -= gui.Style.Tabs.ContainerBox.BorderThickness;
-            rect.H += gui.Style.Tabs.ContainerBox.BorderThickness;
+            rect.Y -= gui.Style.Tabs.ContainerBox.BorderThickness * 2.0f;
+            rect.H += gui.Style.Tabs.ContainerBox.BorderThickness * 2.0f;
             rect.X += gui.Style.Button.BorderThickness;
             rect.W -= gui.Style.Button.BorderThickness * 2;
 
