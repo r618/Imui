@@ -219,7 +219,7 @@ namespace Imui.Controls
             var borderWidth = gui.Style.Dropdown.Button.BorderThickness;
             var arrowWidth = Mathf.Min(rect.W * 0.5f, rect.H);
             var buttonRect = rect.TakeRight(arrowWidth, -borderWidth, out var previewRect);
-            var paddedButtonRect = buttonRect.WithPadding(gui.Style.Dropdown.EmbeddedButtonPadding);
+            var paddedButtonRect = buttonRect.WithPadding(gui.Style.Global.EmbeddedButtonPadding);
             var clicked = false;
 
             switch (preview)

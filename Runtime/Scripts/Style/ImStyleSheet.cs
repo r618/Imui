@@ -5,6 +5,7 @@ namespace Imui.Style
     public struct ImStyleGlobal
     {
         public float ReadOnlyModifier;
+        public float EmbeddedButtonPadding;
     }
     
     [Serializable]

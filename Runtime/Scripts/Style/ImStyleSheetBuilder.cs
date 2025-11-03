@@ -90,12 +90,11 @@ namespace Imui.Style
                 BorderContrast = theme.BorderContrast,
                 IsDark = palette.IsDark
             };
-
-            var embeddedButtonPadding = Math.Max(theme.BorderThickness, 3.0f);
             
             // global
 
             sheet.Global.ReadOnlyModifier = theme.ReadOnlyColorMultiplier;
+            sheet.Global.EmbeddedButtonPadding = Math.Max(theme.BorderThickness, 3.0f);
             
             // text
 
@@ -339,7 +338,6 @@ namespace Imui.Style
             // dropdown
             
             sheet.Dropdown.ArrowScale = 0.5f;
-            sheet.Dropdown.EmbeddedButtonPadding = embeddedButtonPadding;
             sheet.Dropdown.Button = sheet.Button;
             sheet.Dropdown.Button.Alignment = new ImAlignment(0.0f, 0.5f);
             sheet.Dropdown.Button.Overflow = ImTextOverflow.Ellipsis;

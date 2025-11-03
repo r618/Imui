@@ -71,8 +71,8 @@ namespace Imui.Examples
 
         private static string singleLineText = "Single line text edit";
         private static string multiLineText = "Multiline text\nedit";
-        private static float floatValue;
-        private static int intValue;
+        private static float floatValue = 10.5f;
+        private static int intValue = 105;
         private static bool isReadOnly;
         private static bool customDropdownOpen;
         private static ImDropdownPreviewType dropdownPreview;
@@ -274,21 +274,9 @@ namespace Imui.Examples
             numericFlag |= showPlusMinusButtons ? ImNumericEditFlag.PlusMinus : ImNumericEditFlag.None;
             numericFlag |= useNumericSlider ? ImNumericEditFlag.Slider : ImNumericEditFlag.None;
 
-            gui.AddSpacingIfLayoutFrameNotEmpty();
-            gui.BeginHorizontal();
-            gui.BeginHorizontal(width: gui.GetLayoutWidth() * 0.6f);
-            gui.NumericEdit(ref floatValue, step: 0.05f, flags: numericFlag);
-            gui.EndHorizontal();
-            gui.Text(Format(" floatValue = ", floatValue, "0.0######"));
-            gui.EndHorizontal();
 
-            gui.AddSpacingIfLayoutFrameNotEmpty();
-            gui.BeginHorizontal();
-            gui.BeginHorizontal(width: gui.GetLayoutWidth() * 0.6f);
-            gui.NumericEdit(ref intValue, flags: numericFlag);
-            gui.EndHorizontal();
-            gui.Text(Format(" intValue = ", intValue));
-            gui.EndHorizontal();
+            gui.NumericEdit(ref floatValue, step: 0.05f, flags: numericFlag, format: "0.0### kg");
+            gui.NumericEdit(ref intValue, flags: numericFlag, format: "0 miles");
 
             gui.AddSpacingIfLayoutFrameNotEmpty();
             gui.Separator("Radio buttons (enum flags)");

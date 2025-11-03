@@ -86,7 +86,6 @@ namespace Imui.Style
     public struct ImStyleDropdown
     {
         public float ArrowScale;
-        public float EmbeddedButtonPadding;
         public ImStyleButton Button;
     }
 
