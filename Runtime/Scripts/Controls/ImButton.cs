@@ -111,7 +111,7 @@ namespace Imui.Controls
                                   ImAdjacency adjacency = default)
         {
             var clicked = Button(gui, id, rect, in style, out state, flag, adjacency);
-            var textSettings = CreateTextSettings(gui);
+            var textSettings = CreateTextSettings(gui, in style);
             var textColor = GetStateFrontColor(in style, state);
             var textRect = CalculateContentRect(gui, rect);
 

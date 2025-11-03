@@ -162,7 +162,7 @@ namespace Imui.Style
             sheet.TextEdit.Normal.Box.BackColor = palette.Control;
             sheet.TextEdit.Normal.Box.FrontColor = palette.Front;
             sheet.TextEdit.Normal.Box.BorderColor = palette.Control.ToBorder(ctx);
-            sheet.TextEdit.Normal.Box.BorderRadius = theme.BorderRadius / 2.0f;
+            sheet.TextEdit.Normal.Box.BorderRadius = theme.BorderRadius / 1.5f;
             sheet.TextEdit.Normal.Box.BorderThickness = theme.BorderThickness;
 
             sheet.TextEdit.Selected.SelectionColor = sheet.TextEdit.Normal.SelectionColor;
@@ -277,7 +277,7 @@ namespace Imui.Style
 
             sheet.List.Box.BorderColor = palette.Control.ToBorder(ctx);
             sheet.List.Box.BackColor = palette.Front.WithAlpha(0.05f);
-            sheet.List.Box.BorderRadius = theme.BorderRadius;
+            sheet.List.Box.BorderRadius = sheet.TextEdit.Normal.Box.BorderRadius;
             sheet.List.Box.BorderThickness = theme.BorderThickness;
             sheet.List.Box.FrontColor = default;
             sheet.List.Padding = theme.Spacing;

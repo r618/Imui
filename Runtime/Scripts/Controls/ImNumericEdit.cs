@@ -391,6 +391,12 @@ namespace Imui.Controls
             var textBuffer = active
                 ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena, EditBuffer.BUFFER_LENGTH)
                 : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena, 0);
+            
+            var adjacency = ImAdjacency.None;
+            if ((flags & ImNumericEditFlag.RightAdjacent) != 0)
+            {
+                adjacency |= ImAdjacency.Right;
+            }
 
             var changed = false;
 
@@ -399,13 +405,26 @@ namespace Imui.Controls
                 ref readonly var style = ref gui.Style.TextEdit.Normal.Box;
 
                 var align = gui.Style.TextEdit.Alignment;
+                var radius = style.BorderRadius;
+
+                if ((adjacency & ImAdjacency.Left) != 0)
+                {
+                    radius.BottomRight = 0;
+                    radius.TopRight = 0;
+                }
+                else if ((adjacency & ImAdjacency.Right) != 0)
+                {
+                    radius.BottomLeft = 0;
+                    radius.TopLeft = 0;
+                }
+
                 var halfVertPadding = Mathf.Max(rect.H - gui.TextDrawer.GetLineHeightFromFontSize(gui.Style.Layout.TextSize), 0.0f) / 2.0f;
                 var textRect = rect.WithPadding(left: gui.Style.Layout.InnerSpacing,
                                                 right: gui.Style.Layout.InnerSpacing,
                                                 top: halfVertPadding,
                                                 bottom: halfVertPadding);
 
-                gui.Canvas.RectWithOutline(rect, style.BackColor, style.BorderColor, style.BorderThickness, style.BorderRadius);
+                gui.Canvas.RectWithOutline(rect, style.BackColor, style.BorderColor, style.BorderThickness, radius);
                 gui.Canvas.Text(textBuffer,
                                 style.FrontColor,
                                 textRect,
@@ -426,7 +445,7 @@ namespace Imui.Controls
             {
                 using (gui.StyleScope(ref gui.Style.TextEdit.Padding.Right, plusMinusRect.W))
                 {
-                    changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric);
+                    changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric, adjacency);
                 }
             }
 
