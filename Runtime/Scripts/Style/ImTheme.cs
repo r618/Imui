@@ -22,11 +22,48 @@ namespace Imui.Style
         public Color Foreground;
         public Color Control;
         public Color Accent;
-        public float Variance;
+        public float Contrast;
+        public float BorderContrast;
+    }
+    
+    public struct ImThemePalette
+    {
+        public bool IsDark;
+
+        public Color Back;
+        public Color Front;
+        public Color Control;
+
+        public Color Accent;
+        public Color AccentFront;
     }
 
     public static class ImThemeBuiltin
     {
+        public static ImTheme Wire()
+        {
+            return new ImTheme()
+            {
+                TextSize = 20f,
+                Spacing = 3.25f,
+                InnerSpacing = 5f,
+                Indent = 12f,
+                ExtraRowHeight = 4f,
+                ScrollBarSize = 13f,
+                WindowBorderRadius = 8f,
+                WindowBorderThickness = 1f,
+                BorderRadius = 5f,
+                BorderThickness = 0.98f,
+                ReadOnlyColorMultiplier = 0.9f,
+                Background = new Color32(255, 255, 255, 255),
+                Foreground = new Color32(30, 30, 30, 255),
+                Accent = new Color32(194, 230, 255, 255),
+                Control = new Color32(255, 255, 255, 255),
+                Contrast = 0f,
+                BorderContrast = 2f
+            };
+        }
+        
         public static ImTheme LightTouch()
         {
             var theme = Light();
@@ -50,10 +87,10 @@ namespace Imui.Style
 
             return theme;
         }
-        
+
         public static ImTheme Light()
         {
-            return new ImTheme
+            return new ImTheme()
             {
                 TextSize = 20f,
                 Spacing = 3f,
@@ -66,11 +103,12 @@ namespace Imui.Style
                 BorderRadius = 5f,
                 BorderThickness = 1f,
                 ReadOnlyColorMultiplier = 0.9f,
-                Background = new Color32(241, 241, 241, 255),
+                Background = new Color32(238, 238, 238, 255),
                 Foreground = new Color32(30, 30, 30, 255),
-                Accent = new Color32(0, 120, 202, 255),
-                Control = new Color32(0, 0, 0, 0),
-                Variance = 0.05f
+                Accent = new Color32(0, 144, 242, 255),
+                Control = new Color32(221, 221, 221, 255),
+                Contrast = -0.03f,
+                BorderContrast = 0.17f
             };
         }
 
@@ -91,9 +129,10 @@ namespace Imui.Style
                 ReadOnlyColorMultiplier = 0.7f,
                 Background = new Color32(58, 58, 58, 255),
                 Foreground = new Color32(224, 224, 224, 255),
-                Accent = new Color32(0, 125, 219, 255),
-                Control = new Color32(255, 255, 255, 8),
-                Variance = 0.18f,
+                Accent = new Color32(17, 121, 200, 255),
+                Control = new Color32(83, 83, 83, 255),
+                Contrast = 0f,
+                BorderContrast = -0.04f
             };
         }
 
@@ -116,7 +155,6 @@ namespace Imui.Style
                 Foreground = new Color32(255, 255, 255, 255),
                 Accent = new Color32(89, 148, 243, 255),
                 Control = new Color32(75, 114, 200, 118),
-                Variance = 0.2f,
             };
         }
 
@@ -139,7 +177,6 @@ namespace Imui.Style
                 Foreground = new Color32(224, 224, 224, 255),
                 Accent = new Color32(211, 85, 12, 255),
                 Control = new Color32(0, 121, 255, 11),
-                Variance = 0.22f,
             };
         }
 
@@ -161,8 +198,9 @@ namespace Imui.Style
                 Background = new Color32(0, 0, 0, 240),
                 Foreground = new Color32(18, 255, 0, 255),
                 Accent = new Color32(52, 224, 0, 255),
-                Control = new Color32(22, 78, 0, 255),
-                Variance = 0.2f,
+                Control = new Color32(0, 95, 3, 255),
+                Contrast = 0f,
+                BorderContrast = 0f
             };
         }
     }

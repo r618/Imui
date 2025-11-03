@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using Imui.Controls;
 using Imui.Core;
 using Imui.Rendering;
@@ -41,7 +40,8 @@ namespace Imui.Examples
             using (new LabeledScope(gui, nameof(theme.Background))) changed |= gui.ColorEdit(ref theme.Background);
             using (new LabeledScope(gui, nameof(theme.Accent))) changed |= gui.ColorEdit(ref theme.Accent);
             using (new LabeledScope(gui, nameof(theme.Control))) changed |= gui.ColorEdit(ref theme.Control);
-            using (new LabeledScope(gui, nameof(theme.Variance))) changed |= gui.Slider(ref theme.Variance, 0.0f, 1.0f);
+            using (new LabeledScope(gui, nameof(theme.Contrast))) changed |= gui.Slider(ref theme.Contrast, -1.0f, +1.0f);
+            using (new LabeledScope(gui, nameof(theme.BorderContrast))) changed |= gui.Slider(ref theme.BorderContrast, -1.0f, +2.0f);
 
             gui.Separator("Values");
 
@@ -66,22 +66,23 @@ namespace Imui.Examples
 
             return "new ImTheme()\n" +
                    "{\n" +
-                   $"    TextSize = {theme.TextSize:0.##}f,\n" +
-                   $"    Spacing = {theme.Spacing:0.##}f,\n" +
-                   $"    InnerSpacing = {theme.InnerSpacing:0.##}f,\n" +
-                   $"    Indent = {theme.Indent:0.##}f,\n" +
-                   $"    ExtraRowHeight = {theme.ExtraRowHeight:0.##}f,\n" +
-                   $"    ScrollBarSize = {theme.ScrollBarSize:0.##}f,\n" +
-                   $"    WindowBorderRadius = {theme.WindowBorderRadius:0.##}f,\n" +
-                   $"    WindowBorderThickness = {theme.WindowBorderThickness:0.##}f,\n" +
-                   $"    BorderRadius = {theme.BorderRadius:0.##}f,\n" +
-                   $"    BorderThickness = {theme.BorderThickness:0.##}f,\n" +
-                   $"    ReadOnlyColorMultiplier = {theme.ReadOnlyColorMultiplier:0.##}f,\n" +
-                   $"    Background = new Color32({AsByte(theme.Background.r)}, {AsByte(theme.Background.g)}, {AsByte(theme.Background.b)}, {AsByte(theme.Background.a)}),\n" +
-                   $"    Foreground = new Color32({AsByte(theme.Foreground.r)}, {AsByte(theme.Foreground.g)}, {AsByte(theme.Foreground.b)}, {AsByte(theme.Foreground.a)}),\n" +
-                   $"    Accent = new Color32({AsByte(theme.Accent.r)}, {AsByte(theme.Accent.g)}, {AsByte(theme.Accent.b)}, {AsByte(theme.Accent.a)}),\n" +
-                   $"    Control = new Color32({AsByte(theme.Control.r)}, {AsByte(theme.Control.g)}, {AsByte(theme.Control.b)}, {AsByte(theme.Control.a)}),\n" +
-                   $"    Variance = {theme.Variance:0.##}f\n" +
+                   $"    {nameof(theme.TextSize)} = {theme.TextSize:0.##}f,\n" +
+                   $"    {nameof(theme.Spacing)} = {theme.Spacing:0.##}f,\n" +
+                   $"    {nameof(theme.InnerSpacing)} = {theme.InnerSpacing:0.##}f,\n" +
+                   $"    {nameof(theme.Indent)} = {theme.Indent:0.##}f,\n" +
+                   $"    {nameof(theme.ExtraRowHeight)} = {theme.ExtraRowHeight:0.##}f,\n" +
+                   $"    {nameof(theme.ScrollBarSize)} = {theme.ScrollBarSize:0.##}f,\n" +
+                   $"    {nameof(theme.WindowBorderRadius)} = {theme.WindowBorderRadius:0.##}f,\n" +
+                   $"    {nameof(theme.WindowBorderThickness)} = {theme.WindowBorderThickness:0.##}f,\n" +
+                   $"    {nameof(theme.BorderRadius)} = {theme.BorderRadius:0.##}f,\n" +
+                   $"    {nameof(theme.BorderThickness)} = {theme.BorderThickness:0.##}f,\n" +
+                   $"    {nameof(theme.ReadOnlyColorMultiplier)} = {theme.ReadOnlyColorMultiplier:0.##}f,\n" +
+                   $"    {nameof(theme.Background)} = new Color32({AsByte(theme.Background.r)}, {AsByte(theme.Background.g)}, {AsByte(theme.Background.b)}, {AsByte(theme.Background.a)}),\n" +
+                   $"    {nameof(theme.Foreground)} = new Color32({AsByte(theme.Foreground.r)}, {AsByte(theme.Foreground.g)}, {AsByte(theme.Foreground.b)}, {AsByte(theme.Foreground.a)}),\n" +
+                   $"    {nameof(theme.Accent)} = new Color32({AsByte(theme.Accent.r)}, {AsByte(theme.Accent.g)}, {AsByte(theme.Accent.b)}, {AsByte(theme.Accent.a)}),\n" +
+                   $"    {nameof(theme.Control)} = new Color32({AsByte(theme.Control.r)}, {AsByte(theme.Control.g)}, {AsByte(theme.Control.b)}, {AsByte(theme.Control.a)}),\n" +
+                   $"    {nameof(theme.Contrast)} = {theme.Contrast:0.##}f,\n" +
+                   $"    {nameof(theme.BorderContrast)} = {theme.BorderContrast:0.##}f\n" +
                    "};";
         }
     }

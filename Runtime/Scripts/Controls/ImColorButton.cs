@@ -76,12 +76,11 @@ namespace Imui.Controls
                 return clicked;
             }
 
-            ref readonly var stateStyle = ref ImButton.GetStateStyle(gui, state);
             var boxStyle = new ImStyleBox
             {
                 BackColor = color,
                 FrontColor = default,
-                BorderColor = stateStyle.BorderColor,
+                BorderColor = ImButton.GetStateBorderColor(in gui.Style.Button, state),
                 BorderThickness = gui.Style.Button.BorderThickness,
             };
 

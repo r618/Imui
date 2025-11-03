@@ -119,11 +119,10 @@ namespace Imui.Controls
 
         public static bool TabBarButton(ImGui gui, uint id, bool selected, ReadOnlySpan<char> label, ImRect rect)
         {
-            var prevButtonStyle = gui.Style.Button;
-            gui.Style.Button = selected ? gui.Style.Tabs.Selected : gui.Style.Tabs.Normal;
+            ref readonly var buttonStyle = ref (selected ? ref gui.Style.Tabs.Selected : ref gui.Style.Tabs.Normal);
 
-            var clicked = gui.Button(id, rect, out var state, adjacency: ImAdjacency.Top);
-            ref readonly var stateStyle = ref ImButton.GetStateStyle(gui, state);
+            var clicked = gui.Button(id, rect, in buttonStyle, out var state, adjacency: ImAdjacency.Top);
+            var frontColor = ImButton.GetStateFrontColor(in buttonStyle, state);
 
             if (selected)
             {
@@ -136,10 +135,8 @@ namespace Imui.Controls
             }
 
             var textSettings = GetTextSettings(gui);
-            gui.Text(label, in textSettings, stateStyle.FrontColor, rect);
-
-            gui.Style.Button = prevButtonStyle;
-
+            gui.Text(label, in textSettings, frontColor, rect);
+            
             return clicked;
         }
 
@@ -147,8 +144,8 @@ namespace Imui.Controls
         {
             var rect = button.TakeBottom(gui.Style.Button.BorderThickness + gui.Style.Tabs.ContainerBox.BorderThickness);
 
-            rect.Y -= gui.Style.Tabs.ContainerBox.BorderThickness;
-            rect.H += gui.Style.Tabs.ContainerBox.BorderThickness;
+            rect.Y -= gui.Style.Tabs.ContainerBox.BorderThickness * 2.0f;
+            rect.H += gui.Style.Tabs.ContainerBox.BorderThickness * 2.0f;
             rect.X += gui.Style.Button.BorderThickness;
             rect.W -= gui.Style.Button.BorderThickness * 2;
 

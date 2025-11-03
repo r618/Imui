@@ -316,11 +316,10 @@ namespace Imui.Controls
 
             active = (state->Selected == id && (!isExpandable || state->Fixed == default)) || state->Fixed == id;
 
-            ref var buttonStyle = ref (active ? ref gui.Style.Menu.ItemActive : ref gui.Style.Menu.ItemNormal);
-            using var _ = gui.StyleScope(ref gui.Style.Button, in buttonStyle);
+            ref readonly var buttonStyle = ref (active ? ref gui.Style.Menu.ItemActive : ref gui.Style.Menu.ItemNormal);
 
-            var clicked = gui.Button(id, contentRect, out var buttonState, ImButtonFlag.ActOnPressMouse) && !isExpandable;
-            var frontColor = ImButton.GetStateFrontColor(gui, buttonState);
+            var clicked = gui.Button(id, contentRect, in buttonStyle, out var buttonState, ImButtonFlag.ActOnPressMouse) && !isExpandable;
+            var frontColor = ImButton.GetStateFrontColor(in buttonStyle, buttonState);
             var labelRect = contentRect.WithPadding(left: gui.Style.Layout.InnerSpacing);
             var extraRect = labelRect.TakeRight(extraWidth, gui.Style.Layout.InnerSpacing, out labelRect)
                                      .ScaleFromCenter(new Vector2(gui.Style.Layout.TextSize / extraWidth, 1.0f))

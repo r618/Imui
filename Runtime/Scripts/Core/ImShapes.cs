@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Imui.Utility;
 using UnityEngine;
 
@@ -52,7 +53,9 @@ namespace Imui.Core
             if (segmentTable == null)
             {
                 segmentTable = new int[SEGMENT_TABLE_SIZE];
-                for (int i = 0; i < SEGMENT_TABLE_SIZE; ++i)
+                segmentTable[0] = 0;
+                
+                for (int i = 1; i < SEGMENT_TABLE_SIZE; ++i)
                 {
                     var radius = i * SEGMENT_TABLE_RES;
                     var segments = Mathf.Clamp(Mathf.CeilToInt(Mathf.PI / Mathf.Acos(1 - Mathf.Min(SEGMENT_MAX_ERROR, radius) / radius)), MIN_SEGMENTS,
@@ -63,13 +66,11 @@ namespace Imui.Core
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SegmentCountForRadius(float radius)
         {
-            if (radius <= SEGMENT_MAX_ERROR)
-            {
-                return MIN_SEGMENTS;
-            }
-
+            radius = radius < 0 ? 0 : radius;
+            
             if (radius < SEGMENT_TABLE_SIZE_MAX)
             {
                 return segmentTable[(int)(radius / SEGMENT_TABLE_RES)];
@@ -113,10 +114,10 @@ namespace Imui.Core
         {
             radius.Clamp(Mathf.Min(rect.W, rect.H) / 2.0f);
 
-            var segTopL = radius.TopLeft < 1 ? 0 : SegmentCountForRadius(radius.TopLeft);
-            var segTopR = radius.TopRight < 1 ? 0 : SegmentCountForRadius(radius.TopRight);
-            var segBotR = radius.BottomRight < 1 ? 0 : SegmentCountForRadius(radius.BottomRight);
-            var segBotL = radius.BottomLeft < 1 ? 0 : SegmentCountForRadius(radius.BottomLeft);
+            var segTopL = SegmentCountForRadius(radius.TopLeft);
+            var segTopR = SegmentCountForRadius(radius.TopRight);
+            var segBotR = SegmentCountForRadius(radius.BottomRight);
+            var segBotL = SegmentCountForRadius(radius.BottomLeft);
             var span = arena.AllocArray<Vector2>(4 + (segTopL + segTopR + segBotR + segBotL));
 
             Rect(in rect, in radius, ref span, segTopL, segTopR, segBotR, segBotL);

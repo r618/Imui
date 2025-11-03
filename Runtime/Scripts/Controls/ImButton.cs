@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using Imui.Core;
 using Imui.IO.Events;
 using Imui.Style;
@@ -27,7 +28,7 @@ namespace Imui.Controls
 
     public static class ImButton
     {
-        public static ImRect AddRect(ImGui gui, ImSize size, ReadOnlySpan<char> label)
+        private static ImRect AddRect(ImGui gui, ImSize size, ReadOnlySpan<char> label)
         {
             if (size.Mode == ImSizeMode.Fit || (size.Mode == ImSizeMode.Auto && gui.Layout.Axis == ImAxis.Horizontal))
             {
@@ -52,6 +53,7 @@ namespace Imui.Controls
             return Button(gui, label, rect, flags);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Button(this ImGui gui,
                                   ReadOnlySpan<char> label,
                                   ImRect rect,
@@ -63,6 +65,7 @@ namespace Imui.Controls
             return Button(gui, id, label, rect, out _, flags, adjacency);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Button(this ImGui gui,
                                   ImRect rect,
                                   out ImButtonState state,
@@ -71,9 +74,10 @@ namespace Imui.Controls
         {
             var id = gui.GetNextControlId();
 
-            return Button(gui, id, rect, out state, flags, adjacency);
+            return Button(gui, id, rect, in gui.Style.Button, out state, flags, adjacency);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Button(this ImGui gui,
                                   uint id,
                                   ReadOnlySpan<char> label,
@@ -84,6 +88,7 @@ namespace Imui.Controls
             return Button(gui, id, label, rect, out _, flag, adjacency);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Button(this ImGui gui,
                                   uint id,
                                   ReadOnlySpan<char> label,
@@ -92,9 +97,22 @@ namespace Imui.Controls
                                   ImButtonFlag flag = ImButtonFlag.None,
                                   ImAdjacency adjacency = default)
         {
-            var clicked = Button(gui, id, rect, out state, flag, adjacency);
-            var textSettings = CreateTextSettings(gui);
-            var textColor = GetStateFrontColor(gui, state);
+            return Button(gui, id, label, rect, in gui.Style.Button, out state, flag, adjacency);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Button(this ImGui gui,
+                                  uint id,
+                                  ReadOnlySpan<char> label,
+                                  ImRect rect,
+                                  in ImStyleButton style,
+                                  out ImButtonState state,
+                                  ImButtonFlag flag = ImButtonFlag.None,
+                                  ImAdjacency adjacency = default)
+        {
+            var clicked = Button(gui, id, rect, in style, out state, flag, adjacency);
+            var textSettings = CreateTextSettings(gui, in style);
+            var textColor = GetStateFrontColor(in style, state);
             var textRect = CalculateContentRect(gui, rect);
 
             gui.Canvas.Text(label, textColor, textRect, in textSettings);
@@ -102,9 +120,21 @@ namespace Imui.Controls
             return clicked;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Button(this ImGui gui,
                                   uint id,
                                   ImRect rect,
+                                  out ImButtonState state,
+                                  ImButtonFlag flag = ImButtonFlag.None,
+                                  ImAdjacency adjacency = default)
+        {
+            return Button(gui, id, rect, in gui.Style.Button, out state, flag, adjacency);
+        }
+
+        public static bool Button(this ImGui gui,
+                                  uint id,
+                                  ImRect rect,
+                                  in ImStyleButton baseStyle,
                                   out ImButtonState state,
                                   ImButtonFlag flag = ImButtonFlag.None,
                                   ImAdjacency adjacency = default)
@@ -117,7 +147,7 @@ namespace Imui.Controls
 
             state = pressed ? ImButtonState.Pressed : hovered ? ImButtonState.Hovered : ImButtonState.Normal;
 
-            gui.Box(rect, GetStateBoxStyle(gui, state).MakeAdjacent(adjacency));
+            gui.Box(rect, MakeBoxStyle(in baseStyle, state).MakeAdjacent(adjacency));
 
             if (gui.IsReadOnly)
             {
@@ -125,15 +155,15 @@ namespace Imui.Controls
             }
 
             ref readonly var evt = ref gui.Input.MouseEvent;
-            
+
             var leftButton = evt.LeftButton ||
                              (flag & ImButtonFlag.ReactToAnyButton) != 0 ||
                              ((flag & ImButtonFlag.ReactToRightButton) != 0 && evt.Button == 1);
-            
-            var actOnPress = 
+
+            var actOnPress =
                 (evt.Device == ImMouseDevice.Mouse & (flag & ImButtonFlag.ActOnPressMouse) != 0) |
                 (evt.Device == ImMouseDevice.Touch & (flag & ImButtonFlag.ActOnPressTouch) != 0);
-                
+
 
             switch (evt.Type)
             {
@@ -206,15 +236,15 @@ namespace Imui.Controls
             }
 
             ref readonly var evt = ref gui.Input.MouseEvent;
-            
+
             var leftButton = evt.Button == 0 ||
                              (flag & ImButtonFlag.ReactToAnyButton) != 0 ||
                              ((flag & ImButtonFlag.ReactToRightButton) != 0 && evt.Button == 1);
 
-            var actOnPress = 
+            var actOnPress =
                 (evt.Device == ImMouseDevice.Mouse & (flag & ImButtonFlag.ActOnPressMouse) != 0) |
                 (evt.Device == ImMouseDevice.Touch & (flag & ImButtonFlag.ActOnPressTouch) != 0);
-                
+
             switch (evt.Type)
             {
                 case ImMouseEventType.Down when leftButton && !pressed && hovered && actOnPress:
@@ -242,21 +272,38 @@ namespace Imui.Controls
             return clicked;
         }
 
-        public static Color32 GetStateFrontColor(ImGui gui, ImButtonState state) => GetStateFrontColor(in gui.Style.Button, state);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Color32 GetStateFrontColor(in ImStyleButton style, ImButtonState state)
         {
-            ref readonly var stateStyle = ref GetStateStyle(in style, state);
-            return stateStyle.FrontColor;
+            return state switch
+            {
+                ImButtonState.Hovered => style.Hovered.FrontColor,
+                ImButtonState.Pressed => style.Pressed.FrontColor,
+                _ => style.Normal.FrontColor
+            };
         }
 
-        public static ImTextSettings CreateTextSettings(ImGui gui) => CreateTextSettings(gui, in gui.Style.Button);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Color32 GetStateBorderColor(in ImStyleButton style, ImButtonState state)
+        {
+            return state switch
+            {
+                ImButtonState.Hovered => style.Hovered.BorderColor,
+                ImButtonState.Pressed => style.Pressed.BorderColor,
+                _ => style.Normal.BorderColor
+            };
+        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ImTextSettings CreateTextSettings(ImGui gui) => CreateTextSettings(gui, in gui.Style.Button);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ImTextSettings CreateTextSettings(ImGui gui, in ImStyleButton style)
         {
             return new ImTextSettings(gui.Style.Layout.TextSize, style.Alignment, false, style.Overflow);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ImRect CalculateContentRect(ImGui gui, ImRect buttonRect)
         {
             buttonRect.X += gui.Style.Layout.InnerSpacing;
@@ -265,9 +312,7 @@ namespace Imui.Controls
             return buttonRect;
         }
 
-        public static ImStyleBox GetStateBoxStyle(ImGui gui, ImButtonState state) => GetStateBoxStyle(in gui.Style.Button, state);
-
-        public static ImStyleBox GetStateBoxStyle(in ImStyleButton style, ImButtonState state)
+        public static ImStyleBox MakeBoxStyle(in ImStyleButton style, ImButtonState state)
         {
             ref readonly var stateStyle = ref GetStateStyle(in style, state);
 
@@ -281,8 +326,7 @@ namespace Imui.Controls
             };
         }
 
-        public static ref readonly ImStyleButtonState GetStateStyle(ImGui gui, ImButtonState state) => ref GetStateStyle(in gui.Style.Button, state);
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref readonly ImStyleButtonState GetStateStyle(in ImStyleButton style, ImButtonState state)
         {
             switch (state)

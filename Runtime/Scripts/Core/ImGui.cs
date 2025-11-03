@@ -260,7 +260,7 @@ namespace Imui.Core
 
             if (isReadOnly)
             {
-                Canvas.PushInvColorMul(1 - Style.Theme.ReadOnlyColorMultiplier);
+                Canvas.PushInvColorMul(1 - Style.Global.ReadOnlyModifier);
             }
             else
             {
@@ -433,9 +433,9 @@ namespace Imui.Core
             return false;
         }
 
-        public void SetTheme(ImTheme theme)
+        public void SetTheme(in ImTheme theme)
         {
-            Style = ImStyleSheetBuilder.Build(theme);
+            Style = ImStyleSheetBuilder.BuildStyleSheet(in theme);
         }
 
         public void RegisterRaycastTarget(ImRect rect)

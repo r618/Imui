@@ -118,6 +118,7 @@ namespace Imui.Style
     {
         public Color32 BackColor;
         public Color32 FrontColor;
+        public Color32 BorderColor;
     }
 
     [Serializable]
@@ -125,6 +126,7 @@ namespace Imui.Style
     {
         public float Size;
         public float BorderThickness;
+        public float HandlePadding;
         public float BorderRadius;
         public float MinHandleAspect;
         public ImPadding VMargin;
@@ -179,6 +181,7 @@ namespace Imui.Style
         public float CaretWidth;
         public ImAlignment Alignment;
         public bool TextWrap;
+        public ImPadding Padding;
     }
 
     [Serializable]

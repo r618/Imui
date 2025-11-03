@@ -30,6 +30,14 @@ namespace Imui.Style
             Top += value;
             Bottom += value;
         }
+        
+        public void Add(in ImPadding padding)
+        {
+            Left += padding.Left;
+            Right += padding.Right;
+            Top += padding.Top;
+            Bottom += padding.Bottom;
+        }
 
         public static implicit operator ImPadding(float padding) => new(padding);
 
@@ -38,13 +46,19 @@ namespace Imui.Style
             padding.Add(value);
             return padding;
         }
+        
+        public static ImPadding operator +(ImPadding padding, in ImPadding value)
+        {
+            padding.Add(in value);
+            return padding;
+        }
 
         public static ImPadding operator -(ImPadding padding, float value)
         {
             padding.Add(-value);
             return padding;
         }
-
+        
         public static ImPadding operator -(ImPadding padding)
         {
             padding.Left = -padding.Left;

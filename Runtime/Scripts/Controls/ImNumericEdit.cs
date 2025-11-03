@@ -354,6 +354,19 @@ namespace Imui.Controls
             var bufferId = gui.GetNextControlId();
             var sliderId = gui.GetNextControlId();
 
+            uint plusId = 0;
+            uint minusId = 0;
+            ImRect plusMinusRect = default;
+
+            if (usePlusMinusButtons)
+            {
+                plusId = gui.GetNextControlId();
+                minusId = gui.GetNextControlId();
+                plusMinusRect = rect.TakeRight(rect.H * 2);
+                plusMinusRect.X += gui.Style.Global.EmbeddedButtonPadding;
+                plusMinusRect.W -= gui.Style.Global.EmbeddedButtonPadding;
+            }
+
             if (!active && useSlider)
             {
                 // (artem-s): when double-clicking, pass control to the text editor
@@ -373,18 +386,13 @@ namespace Imui.Controls
                 }
             }
 
-            if (usePlusMinusButtons)
-            {
-                delta = PlusMinusButtons(gui, ref rect) * step.AsDouble();
-            }
-
             gui.PopId();
 
             var textBuffer = active
                 ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena, EditBuffer.BUFFER_LENGTH)
                 : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena, 0);
-
-            var adjacency = usePlusMinusButtons ? ImAdjacency.Left : ImAdjacency.None;
+            
+            var adjacency = ImAdjacency.None;
             if ((flags & ImNumericEditFlag.RightAdjacent) != 0)
             {
                 adjacency |= ImAdjacency.Right;
@@ -435,7 +443,44 @@ namespace Imui.Controls
             }
             else
             {
-                changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric, adjacency);
+                using (gui.StyleScope(ref gui.Style.TextEdit.Padding.Right, plusMinusRect.W))
+                {
+                    changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric, adjacency);
+                }
+            }
+
+            if (usePlusMinusButtons)
+            {
+                Span<ImRect> rects = stackalloc ImRect[2];
+                plusMinusRect.SplitHorizontal(ref rects, -gui.Style.Global.EmbeddedButtonPadding);
+                
+                var prev = gui.Style.EmbeddedButton.BorderRadius;
+                gui.Style.EmbeddedButton.BorderRadius = gui.Style.TextEdit.Normal.Box.BorderRadius.BottomRight;
+
+                if (gui.Button(minusId,
+                               "-",
+                               rects[0].WithPadding(gui.Style.Global.EmbeddedButtonPadding),
+                               in gui.Style.EmbeddedButton,
+                               out _,
+                               ImButtonFlag.ReactToHeldDown))
+                {
+                    delta -= step.AsDouble();
+                }
+
+                if (gui.Button(plusId,
+                               "+",
+                               rects[1].WithPadding(gui.Style.Global.EmbeddedButtonPadding),
+                               in gui.Style.EmbeddedButton,
+                               out _,
+                               ImButtonFlag.ReactToHeldDown))
+                {
+                    delta += step.AsDouble();
+                }
+
+                gui.Style.EmbeddedButton.BorderRadius = prev;
+                
+                gui.RegisterControl(minusId, rects[0]);
+                gui.RegisterControl(plusId, rects[1]);
             }
 
             var justActivated = !active && gui.IsControlActive(id);
@@ -470,29 +515,6 @@ namespace Imui.Controls
             }
 
             return changed;
-        }
-
-        private static int PlusMinusButtons(ImGui gui, ref ImRect rect)
-        {
-            var border = gui.Style.Button.BorderThickness;
-            var height = rect.H;
-            var width = height;
-
-            var plusBtnRect = rect.TakeRight(width, -border, out rect);
-            var minusBtnRect = rect.TakeRight(width, -border, out rect);
-            var delta = 0;
-
-            if (gui.Button("-", minusBtnRect, flags: ImButtonFlag.ReactToHeldDown, ImAdjacency.Middle))
-            {
-                delta--;
-            }
-
-            if (gui.Button("+", plusBtnRect, flags: ImButtonFlag.ReactToHeldDown, ImAdjacency.Right))
-            {
-                delta++;
-            }
-
-            return delta;
         }
 
         private static void HandleDrag(in ImMouseEvent evt, ref double delta, double step, double min, double max, in ImRect rect)
@@ -560,7 +582,7 @@ namespace Imui.Controls
             public void Populate(ReadOnlySpan<char> str)
             {
                 var stringToCopy = str[..Math.Min(BUFFER_LENGTH, str.Length)];
-                
+
                 fixed (char* buf = fixedBuffer)
                 {
                     stringToCopy.CopyTo(new Span<char>(buf, BUFFER_LENGTH));

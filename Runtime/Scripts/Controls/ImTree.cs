@@ -180,7 +180,7 @@ namespace Imui.Controls
                 changed = true;
             }
 
-            var boxStyle = ImButton.GetStateBoxStyle(in buttonStyle, buttonState);
+            var boxStyle = ImButton.MakeBoxStyle(in buttonStyle, buttonState);
             if (boxStyle.BackColor.a > 0)
             {
                 gui.Box(rect, boxStyle);

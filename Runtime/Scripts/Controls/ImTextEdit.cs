@@ -348,7 +348,7 @@ namespace Imui.Controls
                 textPadding.Bottom = halfVertPadding;
             }
 
-            var textRect = rect.WithPadding(textPadding);
+            var textRect = rect.WithPadding(textPadding + gui.Style.TextEdit.Padding);
 
             gui.Canvas.PushRectMask(rect, stateStyle.Box.BorderRadius);
             gui.Layout.Push(ImAxis.Vertical, textRect, ImLayoutFlag.Root);
@@ -365,6 +365,11 @@ namespace Imui.Controls
                 wrap,
                 ImTextOverflow.Overflow);
 
+            if (selected)
+            {
+                DrawSelection(gui, state.Caret, state.Selection, textRect, in layout, in stateStyle, in buffer);
+            }
+            
             textRect = gui.Layout.AddRect(layout.Width, layout.Height);
             gui.Canvas.Text(buffer, stateStyle.Box.FrontColor, textRect.TopLeft, in layout);
 
@@ -421,7 +426,6 @@ namespace Imui.Controls
             if (selected)
             {
                 DrawCaret(gui, state.Caret, state.BlinkTime, textRect, in layout, in stateStyle, in buffer);
-                DrawSelection(gui, state.Caret, state.Selection, textRect, in layout, in stateStyle, in buffer);
 
                 for (int i = 0; i < gui.Input.KeyboardEventsCount; ++i)
                 {

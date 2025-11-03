@@ -120,7 +120,7 @@ namespace Imui.Controls
             textRect.W -= gui.Style.Layout.InnerSpacing;
             gui.Canvas.Text(label, gui.Style.Text.Color, textRect, textSettings);
 
-            if (gui.InvisibleButton(id, textRect, ImButtonFlag.ActOnPressMouse))
+            if (gui.InvisibleButton(id, rect, ImButtonFlag.ActOnPressMouse))
             {
                 value = !value;
                 changed = true;
@@ -133,10 +133,8 @@ namespace Imui.Controls
         {
             ref readonly var style = ref (value ? ref gui.Style.Radiobox.Checked : ref gui.Style.Radiobox.Normal);
 
-            using var _ = gui.StyleScope(ref gui.Style.Button, in style);
-
-            var clicked = gui.Button(id, rect, out var state);
-            var frontColor = ImButton.GetStateFrontColor(gui, state);
+            var clicked = gui.Button(id, rect, in style, out var state);
+            var frontColor = ImButton.GetStateFrontColor(in style, state);
 
             if (value)
             {

@@ -157,25 +157,23 @@ namespace Imui.Controls
             var handleRect = new ImRect(handleX, handleY, handleW, handleH);
 
             ref readonly var evt = ref gui.Input.MouseEvent;
+            ref readonly var buttonStyle = ref gui.Style.Slider.Handle;
+            
+            var type = evt.Type;
+            var device = evt.Device;
 
-            using (gui.StyleScope(ref gui.Style.Button, gui.Style.Slider.Handle))
+            if (gui.Button(id, handleRect, in buttonStyle, out _, ImButtonFlag.ActOnPressMouse))
             {
-                var type = evt.Type;
-                var device = evt.Device;
+                normValue = Mathf.InverseLerp(xmin, xmax, Mathf.Lerp(xmin, xmax, (gui.Input.MousePosition.x - xmin) / (xmax - xmin)));
+                changed = true;
 
-                if (gui.Button(id, handleRect, out _, ImButtonFlag.ActOnPressMouse))
+                if (type == ImMouseEventType.Down && device == ImMouseDevice.Mouse)
                 {
-                    normValue = Mathf.InverseLerp(xmin, xmax, Mathf.Lerp(xmin, xmax, (gui.Input.MousePosition.x - xmin) / (xmax - xmin)));
-                    changed = true;
-
-                    if (type == ImMouseEventType.Down && device == ImMouseDevice.Mouse)
-                    {
-                        // if button is activated on press, select control, so we can continue to scroll while mouse is down
-                        gui.SetActiveControl(id, ImControlFlag.Draggable);
-                    }
+                    // if button is activated on press, select control, so we can continue to scroll while mouse is down
+                    gui.SetActiveControl(id, ImControlFlag.Draggable);
                 }
             }
-
+                
             gui.RegisterControl(id, rect);
 
             if (gui.IsReadOnly)

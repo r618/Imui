@@ -214,31 +214,30 @@ namespace Imui.Controls
 
         public static bool TitleBarCloseButton(ImGui gui, ImRect rect)
         {
+            ref readonly var buttonStyle = ref gui.Style.Window.TitleBar.CloseButton;
             var closeButtonRect = rect.WithPadding(gui.Style.Layout.InnerSpacing)
                                       .TakeRight(gui.GetRowHeight() - gui.Style.Layout.InnerSpacing)
                                       .WithAspect(1.0f);
+            
+            var id = gui.GetNextControlId();
+            var clicked = gui.Button(id, closeButtonRect, in buttonStyle, out var buttonState);
+            var color = ImButton.GetStateFrontColor(in buttonStyle, buttonState);
+            var width = closeButtonRect.W * 0.08f;
 
-            using (gui.StyleScope(ref gui.Style.Button, in gui.Style.Window.TitleBar.CloseButton))
+            Span<Vector2> path = stackalloc Vector2[2]
             {
-                var clicked = gui.Button(closeButtonRect, out var buttonState);
-                var color = ImButton.GetStateFrontColor(gui, buttonState);
-                var width = closeButtonRect.W * 0.08f;
+                Vector2.Lerp(closeButtonRect.Center, closeButtonRect.TopRight, 0.35f),
+                Vector2.Lerp(closeButtonRect.Center, closeButtonRect.BottomLeft, 0.35f)
+            };
 
-                Span<Vector2> path = stackalloc Vector2[2]
-                {
-                    Vector2.Lerp(closeButtonRect.Center, closeButtonRect.TopRight, 0.35f),
-                    Vector2.Lerp(closeButtonRect.Center, closeButtonRect.BottomLeft, 0.35f)
-                };
+            gui.Canvas.Line(path, color, false, width);
 
-                gui.Canvas.Line(path, color, false, width);
+            path[0] = Vector2.Lerp(closeButtonRect.Center, closeButtonRect.TopLeft, 0.35f);
+            path[1] = Vector2.Lerp(closeButtonRect.Center, closeButtonRect.BottomRight, 0.35f);
 
-                path[0] = Vector2.Lerp(closeButtonRect.Center, closeButtonRect.TopLeft, 0.35f);
-                path[1] = Vector2.Lerp(closeButtonRect.Center, closeButtonRect.BottomRight, 0.35f);
+            gui.Canvas.Line(path, color, false, width);
 
-                gui.Canvas.Line(path, color, false, width);
-
-                return clicked;
-            }
+            return clicked;
         }
 
         public static void DrawTitleBar(ImGui gui, ImRect rect, ReadOnlySpan<char> text)

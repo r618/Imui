@@ -219,39 +219,41 @@ namespace Imui.Controls
             var borderWidth = gui.Style.Dropdown.Button.BorderThickness;
             var arrowWidth = Mathf.Min(rect.W * 0.5f, rect.H);
             var buttonRect = rect.TakeRight(arrowWidth, -borderWidth, out var previewRect);
-            var clicked = ArrowButton(gui, id, buttonRect, ImAdjacency.Right);
+            var paddedButtonRect = buttonRect.WithPadding(gui.Style.Global.EmbeddedButtonPadding);
+            var clicked = false;
 
             switch (preview)
             {
                 case ImDropdownPreviewType.Text:
-                    gui.TextEditNonEditable(label, previewRect, false, ImAdjacency.Left);
+                    using (gui.StyleScope(ref gui.Style.TextEdit.Padding.Right, buttonRect.W - previewRect.W))
+                    {
+                        gui.TextEditNonEditable(label, rect, false);
+                    }
+
+                    clicked = ArrowButton(gui, id, paddedButtonRect);
                     break;
                 case ImDropdownPreviewType.Default:
-                    using (gui.StyleScope(ref gui.Style.Button, in gui.Style.Dropdown.Button))
-                    {
-                        clicked |= gui.Button(id, label, previewRect, adjacency: ImAdjacency.Left);
-                    }
+                    clicked |= gui.Button(id, label, rect, in gui.Style.Dropdown.Button, out _);
+                    clicked |= ArrowButton(gui, id, paddedButtonRect);
                     break;
             }
 
+            gui.RegisterControl(id, buttonRect);
             gui.SetLastControl(id, rect);
 
             return clicked;
         }
 
-        public static bool ArrowButton(ImGui gui, uint id, ImRect rect, ImAdjacency adjacency = ImAdjacency.None)
+        public static bool ArrowButton(ImGui gui, uint id, ImRect rect)
         {
-            bool clicked;
+            ref readonly var buttonStyle = ref gui.Style.EmbeddedButton;
+            
+            var clicked = gui.Button(id, rect, in buttonStyle, out var state);
 
-            using (gui.StyleScope(ref gui.Style.Button, in gui.Style.Dropdown.Button))
-            {
-                clicked = gui.Button(id, rect, out var state, adjacency: adjacency);
+            rect = rect.WithAspect(1.0f);
+            rect = rect.ScaleFromCenter(gui.Style.Layout.TextSize / rect.W);
 
-                rect = rect.WithAspect(1.0f);
-                rect = rect.ScaleFromCenter(gui.Style.Layout.TextSize / rect.W);
-
-                ImFoldout.DrawArrowDown(gui.Canvas, rect, ImButton.GetStateFrontColor(gui, state), gui.Style.Dropdown.ArrowScale);
-            }
+            ImFoldout.DrawArrowDown(gui.Canvas, rect, ImButton.GetStateFrontColor(in buttonStyle, state), gui.Style.Dropdown.ArrowScale);
 
             return clicked;
         }

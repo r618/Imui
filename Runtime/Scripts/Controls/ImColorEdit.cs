@@ -49,7 +49,7 @@ namespace Imui.Controls
             var cId = gui.GetNextControlId();
             
             Span<ImRect> rects = stackalloc ImRect[5];
-            rect.SplitHorizontal(ref rects, rects.Length, gui.Style.Layout.InnerSpacing);
+            rect.SplitHorizontal(ref rects, rects.Length, gui.Style.Layout.Spacing);
 
             ComponentLetter(gui, in rects[0], Color.red, 'R', out rects[0]);
             ComponentLetter(gui, in rects[1], Color.green,'G', out rects[1]);

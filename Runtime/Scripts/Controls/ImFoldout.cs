@@ -36,19 +36,19 @@ namespace Imui.Controls
 
         public static void DrawFoldout(ImGui gui, uint id, ref bool open, ReadOnlySpan<char> label, ImRect rect)
         {
-            using var _ = gui.StyleScope(ref gui.Style.Button, gui.Style.Foldout.Button);
+            ref readonly var buttonStyle = ref gui.Style.Foldout.Button;
 
-            var textSettings = ImButton.CreateTextSettings(gui);
+            var textSettings = ImButton.CreateTextSettings(gui, in buttonStyle);
             var arrowSize = gui.Style.Layout.TextSize;
             var contentRect = ImButton.CalculateContentRect(gui, rect);
             var arrowRect = contentRect.TakeLeft(arrowSize, gui.Style.Layout.InnerSpacing, out var labelRect).WithAspect(1.0f);
 
-            if (gui.Button(id, rect, out var state))
+            if (gui.Button(id, rect, in buttonStyle, out var state))
             {
                 open = !open;
             }
 
-            var frontColor = ImButton.GetStateFrontColor(gui, state);
+            var frontColor = ImButton.GetStateFrontColor(in buttonStyle, state);
 
             if (open)
             {
