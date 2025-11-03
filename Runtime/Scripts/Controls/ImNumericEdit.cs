@@ -474,6 +474,8 @@ namespace Imui.Controls
 
         private static int PlusMinusButtons(ImGui gui, ref ImRect rect)
         {
+            using var _ = gui.StyleScope(ref gui.Style.Button.BorderRadius, in gui.Style.TextEdit.Normal.Box.BorderRadius.TopRight);
+            
             var border = gui.Style.Button.BorderThickness;
             var height = rect.H;
             var width = height;

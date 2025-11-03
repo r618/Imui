@@ -23,10 +23,37 @@ namespace Imui.Style
         public Color Control;
         public Color Accent;
         public float Variance;
+        public float Contrast;
+        public float BorderContrast;
     }
 
     public static class ImThemeBuiltin
     {
+        public static ImTheme Wire()
+        {
+            return new ImTheme()
+            {
+                TextSize = 20f,
+                Spacing = 3.25f,
+                InnerSpacing = 5f,
+                Indent = 12f,
+                ExtraRowHeight = 4f,
+                ScrollBarSize = 13f,
+                WindowBorderRadius = 8f,
+                WindowBorderThickness = 1f,
+                BorderRadius = 5f,
+                BorderThickness = 0.98f,
+                ReadOnlyColorMultiplier = 0.9f,
+                Background = new Color32(255, 255, 255, 255),
+                Foreground = new Color32(30, 30, 30, 255),
+                Accent = new Color32(194, 230, 255, 255),
+                Control = new Color32(255, 255, 255, 255),
+                Variance = 0.05f,
+                Contrast = 0f,
+                BorderContrast = 2f
+            };
+        }
+        
         public static ImTheme LightTouch()
         {
             var theme = Light();
@@ -53,7 +80,7 @@ namespace Imui.Style
         
         public static ImTheme Light()
         {
-            return new ImTheme
+            return new ImTheme()
             {
                 TextSize = 20f,
                 Spacing = 3f,
@@ -66,11 +93,13 @@ namespace Imui.Style
                 BorderRadius = 5f,
                 BorderThickness = 1f,
                 ReadOnlyColorMultiplier = 0.9f,
-                Background = new Color32(241, 241, 241, 255),
+                Background = new Color32(227, 227, 227, 255),
                 Foreground = new Color32(30, 30, 30, 255),
                 Accent = new Color32(0, 120, 202, 255),
-                Control = new Color32(0, 0, 0, 0),
-                Variance = 0.05f
+                Control = new Color32(255, 255, 255, 0),
+                Variance = 0.05f,
+                Contrast = 0.37f,
+                BorderContrast = -0.07f
             };
         }
 

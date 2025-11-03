@@ -541,7 +541,7 @@ namespace Imui.Examples
             }
             gui.AddSpacing();
 
-#if UNITY_WEBGL
+#if UNITY_EDITOR
             if (gui.Button("Copy"))
             {
                 gui.Input.Clipboard = ImThemeEditor.BuildCodeString(in themes[selectedThemeIndex]);
