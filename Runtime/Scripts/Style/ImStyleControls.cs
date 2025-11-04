@@ -13,35 +13,6 @@ namespace Imui.Style
         public Color32 BorderColor;
         public float BorderThickness;
         public ImRectRadius BorderRadius;
-
-        public ImStyleBox MakeAdjacent(ImAdjacency adjacency)
-        {
-            if ((adjacency & ImAdjacency.Left) != 0)
-            {
-                BorderRadius.BottomRight = 0;
-                BorderRadius.TopRight = 0;
-            }
-
-            if ((adjacency & ImAdjacency.Right) != 0)
-            {
-                BorderRadius.BottomLeft = 0;
-                BorderRadius.TopLeft = 0;
-            }
-
-            if ((adjacency & ImAdjacency.Top) != 0)
-            {
-                BorderRadius.BottomLeft = 0;
-                BorderRadius.BottomRight = 0;
-            }
-
-            if ((adjacency & ImAdjacency.Bottom) != 0)
-            {
-                BorderRadius.TopLeft = 0;
-                BorderRadius.TopRight = 0;
-            }
-
-            return this;
-        }
     }
 
     [Serializable]
@@ -69,7 +40,7 @@ namespace Imui.Style
         public ImStyleButtonState Hovered;
         public ImStyleButtonState Pressed;
         public float BorderThickness;
-        public float BorderRadius;
+        public ImRectRadius BorderRadius;
         public ImAlignment Alignment;
         public ImTextOverflow Overflow;
     }

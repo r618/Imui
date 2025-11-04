@@ -406,7 +406,11 @@ namespace Imui.Style
 
             sheet.Tabs.IndicatorColor = palette.Accent;
             sheet.Tabs.Normal = sheet.Button;
+            sheet.Tabs.Normal.BorderRadius.BottomLeft = 0.0f;
+            sheet.Tabs.Normal.BorderRadius.BottomRight = 0.0f;
             sheet.Tabs.Selected = sheet.Button;
+            sheet.Tabs.Selected.BorderRadius.BottomLeft = 0.0f;
+            sheet.Tabs.Selected.BorderRadius.BottomRight = 0.0f;
             sheet.Tabs.Selected.Normal.BackColor = palette.Back;
             sheet.Tabs.Selected.Hovered.BackColor = sheet.Tabs.Selected.Normal.BackColor;
 

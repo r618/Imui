@@ -16,8 +16,7 @@ namespace Imui.Controls
     {
         None = 0,
         PlusMinus = 1 << 0,
-        Slider = 1 << 1,
-        RightAdjacent = 1 << 2
+        Slider = 1 << 1
     }
 
     public static class ImNumericEdit
@@ -328,15 +327,207 @@ namespace Imui.Controls
             return changed;
         }
 
-        public static unsafe bool NumericEditControl(ImGui gui,
-                                                     uint id,
-                                                     ref NumberValue value,
-                                                     ImRect rect,
-                                                     ReadOnlySpan<char> format,
-                                                     NumberValue step,
-                                                     NumberValue min,
-                                                     NumberValue max,
-                                                     ImNumericEditFlag flags)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ref ImGroup group,
+                                       uint id,
+                                       ref byte value,
+                                       ReadOnlySpan<char> format = default,
+                                       byte step = 1,
+                                       byte min = byte.MinValue,
+                                       byte max = byte.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var item = group.GetNext();
+            bool changed;
+            
+            var normalBorder = group.Gui.Style.TextEdit.Normal.Box.BorderRadius;
+            var selectedBorder = group.Gui.Style.TextEdit.Selected.Box.BorderRadius;
+            
+            try
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius.Apply(item.Flags);
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius.Apply(item.Flags);
+            
+                changed = NumericEdit(group.Gui, id, ref value, item.Rect, format, step, min, max, flags);
+            }
+            finally
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius = normalBorder;
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius = selectedBorder;
+            }
+            
+            return changed;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ref ImGroup group,
+                                       uint id,
+                                       ref short value,
+                                       ReadOnlySpan<char> format = default,
+                                       short step = 1,
+                                       short min = short.MinValue,
+                                       short max = short.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var item = group.GetNext();
+            bool changed;
+            
+            var normalBorder = group.Gui.Style.TextEdit.Normal.Box.BorderRadius;
+            var selectedBorder = group.Gui.Style.TextEdit.Selected.Box.BorderRadius;
+            
+            try
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius.Apply(item.Flags);
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius.Apply(item.Flags);
+            
+                changed = NumericEdit(group.Gui, id, ref value, item.Rect, format, step, min, max, flags);
+            }
+            finally
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius = normalBorder;
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius = selectedBorder;
+            }
+            
+            return changed;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ref ImGroup group,
+                                       uint id,
+                                       ref int value,
+                                       ReadOnlySpan<char> format = default,
+                                       int step = 1,
+                                       int min = int.MinValue,
+                                       int max = int.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var item = group.GetNext();
+            bool changed;
+            
+            var normalBorder = group.Gui.Style.TextEdit.Normal.Box.BorderRadius;
+            var selectedBorder = group.Gui.Style.TextEdit.Selected.Box.BorderRadius;
+            
+            try
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius.Apply(item.Flags);
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius.Apply(item.Flags);
+            
+                changed = NumericEdit(group.Gui, id, ref value, item.Rect, format, step, min, max, flags);
+            }
+            finally
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius = normalBorder;
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius = selectedBorder;
+            }
+            
+            return changed;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ref ImGroup group,
+                                       uint id,
+                                       ref long value,
+                                       ReadOnlySpan<char> format = default,
+                                       long step = 1,
+                                       long min = long.MinValue,
+                                       long max = long.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var item = group.GetNext();
+            bool changed;
+            
+            var normalBorder = group.Gui.Style.TextEdit.Normal.Box.BorderRadius;
+            var selectedBorder = group.Gui.Style.TextEdit.Selected.Box.BorderRadius;
+            
+            try
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius.Apply(item.Flags);
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius.Apply(item.Flags);
+            
+                changed = NumericEdit(group.Gui, id, ref value, item.Rect, format, step, min, max, flags);
+            }
+            finally
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius = normalBorder;
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius = selectedBorder;
+            }
+            
+            return changed;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ref ImGroup group,
+                                       uint id,
+                                       ref float value,
+                                       ReadOnlySpan<char> format = default,
+                                       float step = 0.1f,
+                                       float min = float.MinValue,
+                                       float max = float.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var item = group.GetNext();
+            bool changed;
+            
+            var normalBorder = group.Gui.Style.TextEdit.Normal.Box.BorderRadius;
+            var selectedBorder = group.Gui.Style.TextEdit.Selected.Box.BorderRadius;
+            
+            try
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius.Apply(item.Flags);
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius.Apply(item.Flags);
+            
+                changed = NumericEdit(group.Gui, id, ref value, item.Rect, format, step, min, max, flags);
+            }
+            finally
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius = normalBorder;
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius = selectedBorder;
+            }
+            
+            return changed;
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NumericEdit(this ref ImGroup group,
+                                       uint id,
+                                       ref double value,
+                                       ReadOnlySpan<char> format = default,
+                                       double step = 0.1d,
+                                       double min = double.MinValue,
+                                       double max = double.MaxValue,
+                                       ImNumericEditFlag flags = default)
+        {
+            var item = group.GetNext();
+            bool changed;
+            
+            var normalBorder = group.Gui.Style.TextEdit.Normal.Box.BorderRadius;
+            var selectedBorder = group.Gui.Style.TextEdit.Selected.Box.BorderRadius;
+            
+            try
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius.Apply(item.Flags);
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius.Apply(item.Flags);
+            
+                changed = NumericEdit(group.Gui, id, ref value, item.Rect, format, step, min, max, flags);
+            }
+            finally
+            {
+                group.Gui.Style.TextEdit.Normal.Box.BorderRadius = normalBorder;
+                group.Gui.Style.TextEdit.Selected.Box.BorderRadius = selectedBorder;
+            }
+            
+            return changed;
+        }
+
+        public static bool NumericEditControl(ImGui gui,
+                                              uint id,
+                                              ref NumberValue value,
+                                              ImRect rect,
+                                              ReadOnlySpan<char> format,
+                                              NumberValue step,
+                                              NumberValue min,
+                                              NumberValue max,
+                                              ImNumericEditFlag flags)
         {
             ImAssert.IsTrue(value.Type == min.Type && value.Type == max.Type && value.Type == step.Type,
                             "value.Type == min.Type && value.Type == max.Type && value.Type == step.Type");
@@ -392,12 +583,6 @@ namespace Imui.Controls
                 ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena, EditBuffer.BUFFER_LENGTH)
                 : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena, 0);
             
-            var adjacency = ImAdjacency.None;
-            if ((flags & ImNumericEditFlag.RightAdjacent) != 0)
-            {
-                adjacency |= ImAdjacency.Right;
-            }
-
             var changed = false;
 
             if (!active && useSlider)
@@ -405,26 +590,13 @@ namespace Imui.Controls
                 ref readonly var style = ref gui.Style.TextEdit.Normal.Box;
 
                 var align = gui.Style.TextEdit.Alignment;
-                var radius = style.BorderRadius;
-
-                if ((adjacency & ImAdjacency.Left) != 0)
-                {
-                    radius.BottomRight = 0;
-                    radius.TopRight = 0;
-                }
-                else if ((adjacency & ImAdjacency.Right) != 0)
-                {
-                    radius.BottomLeft = 0;
-                    radius.TopLeft = 0;
-                }
-
                 var halfVertPadding = Mathf.Max(rect.H - gui.TextDrawer.GetLineHeightFromFontSize(gui.Style.Layout.TextSize), 0.0f) / 2.0f;
                 var textRect = rect.WithPadding(left: gui.Style.Layout.InnerSpacing,
                                                 right: gui.Style.Layout.InnerSpacing,
                                                 top: halfVertPadding,
                                                 bottom: halfVertPadding);
 
-                gui.Canvas.RectWithOutline(rect, style.BackColor, style.BorderColor, style.BorderThickness, radius);
+                gui.Canvas.RectWithOutline(rect, style.BackColor, style.BorderColor, style.BorderThickness, style.BorderRadius);
                 gui.Canvas.Text(textBuffer,
                                 style.FrontColor,
                                 textRect,
@@ -445,42 +617,31 @@ namespace Imui.Controls
             {
                 using (gui.StyleScope(ref gui.Style.TextEdit.Padding.Right, plusMinusRect.W))
                 {
-                    changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric, adjacency);
+                    changed = gui.TextEdit(id, ref textBuffer, rect, false, ImTouchKeyboardType.Numeric);
                 }
             }
 
             if (usePlusMinusButtons)
             {
-                Span<ImRect> rects = stackalloc ImRect[2];
-                plusMinusRect.SplitHorizontal(ref rects, -gui.Style.Global.EmbeddedButtonPadding);
+                var group = new ImGroup(gui, plusMinusRect.WithPadding(gui.Style.Global.EmbeddedButtonPadding), 2);
                 
-                var prev = gui.Style.EmbeddedButton.BorderRadius;
-                gui.Style.EmbeddedButton.BorderRadius = gui.Style.TextEdit.Normal.Box.BorderRadius.BottomRight;
-
-                if (gui.Button(minusId,
+                if (group.Button(minusId,
                                "-",
-                               rects[0].WithPadding(gui.Style.Global.EmbeddedButtonPadding),
-                               in gui.Style.EmbeddedButton,
+                               gui.Style.EmbeddedButton,
                                out _,
                                ImButtonFlag.ReactToHeldDown))
                 {
                     delta -= step.AsDouble();
                 }
 
-                if (gui.Button(plusId,
+                if (group.Button(plusId,
                                "+",
-                               rects[1].WithPadding(gui.Style.Global.EmbeddedButtonPadding),
-                               in gui.Style.EmbeddedButton,
+                               gui.Style.EmbeddedButton,
                                out _,
                                ImButtonFlag.ReactToHeldDown))
                 {
                     delta += step.AsDouble();
                 }
-
-                gui.Style.EmbeddedButton.BorderRadius = prev;
-                
-                gui.RegisterControl(minusId, rects[0]);
-                gui.RegisterControl(plusId, rects[1]);
             }
 
             var justActivated = !active && gui.IsControlActive(id);

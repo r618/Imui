@@ -57,24 +57,22 @@ namespace Imui.Controls
         public static bool Button(this ImGui gui,
                                   ReadOnlySpan<char> label,
                                   ImRect rect,
-                                  ImButtonFlag flags = ImButtonFlag.None,
-                                  ImAdjacency adjacency = ImAdjacency.None)
+                                  ImButtonFlag flags = ImButtonFlag.None)
         {
             var id = gui.GetNextControlId();
 
-            return Button(gui, id, label, rect, out _, flags, adjacency);
+            return Button(gui, id, label, rect, out _, flags);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Button(this ImGui gui,
                                   ImRect rect,
                                   out ImButtonState state,
-                                  ImButtonFlag flags = ImButtonFlag.None,
-                                  ImAdjacency adjacency = ImAdjacency.None)
+                                  ImButtonFlag flags = ImButtonFlag.None)
         {
             var id = gui.GetNextControlId();
 
-            return Button(gui, id, rect, in gui.Style.Button, out state, flags, adjacency);
+            return Button(gui, id, rect, in gui.Style.Button, out state, flags);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,10 +80,9 @@ namespace Imui.Controls
                                   uint id,
                                   ReadOnlySpan<char> label,
                                   ImRect rect,
-                                  ImButtonFlag flag = ImButtonFlag.None,
-                                  ImAdjacency adjacency = default)
+                                  ImButtonFlag flag = ImButtonFlag.None)
         {
-            return Button(gui, id, label, rect, out _, flag, adjacency);
+            return Button(gui, id, label, rect, out _, flag);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -94,23 +91,20 @@ namespace Imui.Controls
                                   ReadOnlySpan<char> label,
                                   ImRect rect,
                                   out ImButtonState state,
-                                  ImButtonFlag flag = ImButtonFlag.None,
-                                  ImAdjacency adjacency = default)
+                                  ImButtonFlag flag = ImButtonFlag.None)
         {
-            return Button(gui, id, label, rect, in gui.Style.Button, out state, flag, adjacency);
+            return Button(gui, id, label, rect, in gui.Style.Button, out state, flag);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
         public static bool Button(this ImGui gui,
                                   uint id,
                                   ReadOnlySpan<char> label,
                                   ImRect rect,
                                   in ImStyleButton style,
                                   out ImButtonState state,
-                                  ImButtonFlag flag = ImButtonFlag.None,
-                                  ImAdjacency adjacency = default)
+                                  ImButtonFlag flag = ImButtonFlag.None)
         {
-            var clicked = Button(gui, id, rect, in style, out state, flag, adjacency);
+            var clicked = Button(gui, id, rect, in style, out state, flag);
             var textSettings = CreateTextSettings(gui, in style);
             var textColor = GetStateFrontColor(in style, state);
             var textRect = CalculateContentRect(gui, rect);
@@ -125,10 +119,27 @@ namespace Imui.Controls
                                   uint id,
                                   ImRect rect,
                                   out ImButtonState state,
-                                  ImButtonFlag flag = ImButtonFlag.None,
-                                  ImAdjacency adjacency = default)
+                                  ImButtonFlag flag = ImButtonFlag.None)
         {
-            return Button(gui, id, rect, in gui.Style.Button, out state, flag, adjacency);
+            return Button(gui, id, rect, in gui.Style.Button, out state, flag);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Button(this ref ImGroup group, uint id, ImStyleButton style, out ImButtonState state, ImButtonFlag flag = ImButtonFlag.None)
+        {
+            var item = group.GetNext();
+            style.BorderRadius.Apply(item.Flags);
+
+            return Button(group.Gui, id, item.Rect, in style, out state, flag);
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Button(this ref ImGroup group, uint id, ReadOnlySpan<char> label, ImStyleButton style, out ImButtonState state, ImButtonFlag flag = ImButtonFlag.None)
+        {
+            var item = group.GetNext();
+            style.BorderRadius.Apply(item.Flags);
+
+            return Button(group.Gui, id, label, item.Rect, in style, out state, flag);
         }
 
         public static bool Button(this ImGui gui,
@@ -136,8 +147,7 @@ namespace Imui.Controls
                                   ImRect rect,
                                   in ImStyleButton baseStyle,
                                   out ImButtonState state,
-                                  ImButtonFlag flag = ImButtonFlag.None,
-                                  ImAdjacency adjacency = default)
+                                  ImButtonFlag flag = ImButtonFlag.None)
         {
             var hovered = gui.IsControlHovered(id);
             var pressed = gui.IsControlActive(id);
@@ -147,7 +157,7 @@ namespace Imui.Controls
 
             state = pressed ? ImButtonState.Pressed : hovered ? ImButtonState.Hovered : ImButtonState.Normal;
 
-            gui.Box(rect, MakeBoxStyle(in baseStyle, state).MakeAdjacent(adjacency));
+            gui.Box(rect, MakeBoxStyle(in baseStyle, state));
 
             if (gui.IsReadOnly)
             {

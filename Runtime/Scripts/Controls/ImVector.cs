@@ -118,26 +118,30 @@ namespace Imui.Controls
 
         public static bool Component(ImGui gui, uint id, ref float value, ImRect rect, char component)
         {
-            ComponentLiteral(gui, in rect, component, out var valueRect);
-            return ImNumericEdit.NumericEdit(gui, id, ref value, valueRect, flags: ImNumericEditFlag.RightAdjacent);
+            var group = new ImGroup(gui, rect, 2);
+            group.SetNextSize(gui.GetRowHeight() * 0.75f);
+            ComponentLiteral(gui, group.GetNext(), component);
+            return group.NumericEdit(id, ref value);
         }
         
         public static bool Component(ImGui gui, uint id, ref int value, ImRect rect, char component)
         {
-            ComponentLiteral(gui, in rect, component, out var valueRect);
-            return ImNumericEdit.NumericEdit(gui, id, ref value, valueRect, flags: ImNumericEditFlag.RightAdjacent);
+            var group = new ImGroup(gui, rect, 2);
+            group.SetNextSize(gui.GetRowHeight() * 0.75f);
+            ComponentLiteral(gui, group.GetNext(), component);
+            return group.NumericEdit(id, ref value);
         }
 
-        public static void ComponentLiteral(ImGui gui, in ImRect rect, char component, out ImRect valueRect)
+        public static void ComponentLiteral(ImGui gui, ImGroup.Item item, char component)
         {
             var textStyle = new ImTextSettings(gui.Style.Layout.TextSize * 0.75f, 0.5f, 0.5f);
-            var componentRect = rect.TakeLeft(gui.GetRowHeight() * 0.75f, -gui.Style.TextEdit.Normal.Box.BorderThickness, out valueRect);
             var componentText = new ReadOnlySpan<char>(&component, 1);
             var componentStyle = gui.Style.TextEdit.Normal.Box;
-            componentStyle.MakeAdjacent(ImAdjacency.Left);
             
-            gui.Box(componentRect, in componentStyle);
-            gui.Text(componentText, textStyle, componentRect);
+            componentStyle.BorderRadius.Apply(item.Flags);
+            
+            gui.Box(item.Rect, in componentStyle);
+            gui.Text(componentText, textStyle, item.Rect);
         }
     }
 }
