@@ -9,11 +9,19 @@ using UnityEngine;
 
 namespace Imui.Controls
 {
+    [Flags]
+    public enum ImTextEditStateFlag
+    {
+        None = 0,
+        NeedScrollToCaret = 1 << 0
+    }
+
     public struct ImTextEditState
     {
         public int Caret;
         public int Selection;
         public double BlinkTime;
+        public ImTextEditStateFlag Flag;
     }
 
     public ref struct ImTextEditBuffer
@@ -26,10 +34,10 @@ namespace Imui.Controls
         private readonly ImArena arena;
         private readonly ReadOnlySpan<char> source;
         private readonly string sourceString;
+        private readonly int maxLength;
 
         private Span<char> mutable;
         private int mutableLength;
-        private int maxLength;
 
         public ImTextEditBuffer(int mutableLength, ImArena arena, int maxLength):
             this(arena.AllocArray<char>(mutableLength), mutableLength, arena, maxLength) { }
@@ -352,38 +360,50 @@ namespace Imui.Controls
                 textPadding.Bottom = halfVertPadding;
             }
 
-            var textRect = rect.WithPadding(textPadding + gui.Style.TextEdit.Padding);
+            var textBounds = rect.WithPadding(textPadding + gui.Style.TextEdit.Padding);
 
             gui.Canvas.PushRectMask(rect, stateStyle.Box.BorderRadius);
-            gui.Layout.Push(ImAxis.Vertical, textRect, ImLayoutFlag.Root);
+            gui.Layout.Push(ImAxis.Vertical, textBounds, ImLayoutFlag.Root);
             gui.BeginScrollable();
 
-            var layoutWidth = wrap ? gui.GetLayoutWidth() : textRect.W;
+            var layoutWidth = wrap ? gui.GetLayoutWidth() : textBounds.W;
             var layout = gui.TextDrawer.BuildTempLayout(
                 buffer,
                 layoutWidth,
-                textRect.H,
+                textBounds.H,
                 textAlignment.X,
                 textAlignment.Y,
                 textSize,
                 wrap,
                 ImTextOverflow.Overflow);
 
+            if (buffer.Length == 0 && !hint.IsEmpty)
+            {
+                var hintTextSettings = new ImTextSettings(textSize, textAlignment, style.TextWrap, ImTextOverflow.Ellipsis);
+                gui.Canvas.Text(hint, style.HintFrontColor, textBounds, in hintTextSettings);
+            }
+
+            var textRect = gui.Layout.AddRect(layout.Width, layout.Height);
+
+            if ((state.Flag & ImTextEditStateFlag.NeedScrollToCaret) != 0)
+            {
+                state.Flag &= ~ImTextEditStateFlag.NeedScrollToCaret;
+                textRect.Position += ScrollToCaret(gui, state, textRect, in layout, buffer);
+
+                if (textRect.W > textBounds.W && textRect.Right < textBounds.Right)
+                {
+                    textRect.X += textBounds.Right - textRect.Right;
+                }
+            }
+
+            state.Caret = Mathf.Clamp(state.Caret, 0, buffer.Length);
+
             if (selected)
             {
                 DrawSelection(gui, state.Caret, state.Selection, textRect, in layout, in stateStyle, in buffer);
             }
 
-            if (buffer.Length == 0 && !hint.IsEmpty)
-            {
-                var hintTextSettings = new ImTextSettings(textSize, textAlignment, style.TextWrap, ImTextOverflow.Ellipsis);
-                gui.Canvas.Text(hint, style.HintFrontColor, textRect, in hintTextSettings);
-            }
-            
-            textRect = gui.Layout.AddRect(layout.Width, layout.Height);
             gui.Canvas.Text(buffer, stateStyle.Box.FrontColor, textRect.TopLeft, in layout);
-            
-            state.Caret = Mathf.Clamp(state.Caret, 0, buffer.Length);
 
             ref readonly var evt = ref gui.Input.MouseEvent;
             switch (evt.Type)
@@ -446,7 +466,16 @@ namespace Imui.Controls
                         textChanged |= isTextChanged;
                         state.BlinkTime = gui.Input.Time;
                         gui.Input.UseKeyboardEvent(i);
-                        ScrollToCaret(gui, state, textRect, in layout, buffer);
+
+                        if (isTextChanged)
+                        {
+                            // (artem-s): we need to build the new text layout to handle scrolling to caret properly, so we do it on the next frame
+                            state.Flag |= ImTextEditStateFlag.NeedScrollToCaret;
+                        }
+                        else
+                        {
+                            ScrollToCaret(gui, state, textRect, in layout, buffer);
+                        }
                     }
                 }
 
@@ -875,43 +904,45 @@ namespace Imui.Controls
             state.Selection = left - right;
         }
 
-        // TODO: doesn't work when caret is horizontally outside of the scope
-        public static void ScrollToCaret(ImGui gui, ImTextEditState state, ImRect textRect, in ImTextLayout layout, ImTextEditBuffer buffer)
+        public static Vector2 ScrollToCaret(ImGui gui, ImTextEditState state, ImRect textRect, in ImTextLayout layout, ImTextEditBuffer buffer)
         {
             var viewPosition = CaretToViewPosition(state.Caret, gui.TextDrawer, textRect, in layout, in buffer);
 
             ref readonly var frame = ref gui.Layout.GetFrame();
             var scrollOffset = gui.GetScrollOffset();
-            var caretTop = viewPosition;
-            var caretBottom = viewPosition - new Vector2(0, layout.LineHeight);
-            var caretOffset = new Vector2();
+            var caretScreenPosition = viewPosition;
+            var caretWidth = state.Caret >= buffer.Length ? 0 : gui.TextDrawer.GetCharacterAdvance(buffer[state.Caret], layout.Size);
+            var caretTop = caretScreenPosition.y;
+            var caretBottom = caretScreenPosition.y - layout.LineHeight;
+            var caretLeft = caretScreenPosition.x;
+            var caretRight = caretScreenPosition.x + caretWidth;
+            var extraOffset = new Vector2();
 
-            if (frame.Bounds.Top < caretTop.y)
+            if (caretTop > frame.Bounds.Top)
             {
-                caretOffset.y += frame.Bounds.Top - caretTop.y;
+                extraOffset.y += frame.Bounds.Top - caretTop;
             }
-            else if (frame.Bounds.Bottom > caretBottom.y)
+            else if (caretBottom < frame.Bounds.Bottom)
             {
-                caretOffset.y += frame.Bounds.Bottom - caretBottom.y;
+                extraOffset.y += frame.Bounds.Bottom - caretBottom;
             }
-
-            var charWidth = state.Caret >= buffer.Length ? 0 : gui.TextDrawer.GetCharacterAdvance(buffer[state.Caret], layout.Size);
-            var caretLeft = caretTop.x;
-            var caretRight = caretTop.x + charWidth;
 
             if (frame.Bounds.Left > caretLeft)
             {
-                caretOffset.x += frame.Bounds.Left - caretLeft;
+                extraOffset.x += frame.Bounds.Left - caretLeft;
             }
             else if (frame.Bounds.Right < caretRight)
             {
-                caretOffset.x += frame.Bounds.Right - caretRight;
+                extraOffset.x += frame.Bounds.Right - caretRight;
             }
 
-            if (caretOffset != default)
+            if (extraOffset != default)
             {
-                gui.SetScrollOffset(scrollOffset + caretOffset);
+                scrollOffset += extraOffset;
+                gui.SetScrollOffset(scrollOffset);
             }
+
+            return extraOffset;
         }
 
         public static ReadOnlySpan<char> GetSelectedText(in ImTextEditState state, in ImTextEditBuffer buffer)
