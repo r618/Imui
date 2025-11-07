@@ -627,7 +627,7 @@ namespace Imui.Controls
                 
                 if (group.Button(minusId,
                                "-",
-                               gui.Style.EmbeddedButton,
+                               gui.Style.AccentButton,
                                out _,
                                ImButtonFlag.ReactToHeldDown))
                 {
@@ -636,7 +636,7 @@ namespace Imui.Controls
 
                 if (group.Button(plusId,
                                "+",
-                               gui.Style.EmbeddedButton,
+                               gui.Style.AccentButton,
                                out _,
                                ImButtonFlag.ReactToHeldDown))
                 {

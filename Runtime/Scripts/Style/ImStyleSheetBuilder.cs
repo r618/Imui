@@ -158,19 +158,22 @@ namespace Imui.Style
 
             // text edit
 
+            var textEditBorderDefault = theme.BorderThickness;
+            var textEditBorderSelected = Math.Min(textEditBorderDefault * 1.5f, Math.Max(theme.BorderThickness, theme.InnerSpacing));
+
             sheet.TextEdit.Normal.SelectionColor = palette.Accent.EnsureLightnessDistance(sheet.Window.Box.BackColor).WithAlpha(0.4f);
-            sheet.TextEdit.Normal.Box.BackColor = palette.Control;
+            sheet.TextEdit.Normal.Box.BackColor = palette.Control.ToHovered(ctx);
             sheet.TextEdit.Normal.Box.FrontColor = palette.Front;
             sheet.TextEdit.Normal.Box.BorderColor = palette.Control.ToBorder(ctx);
             sheet.TextEdit.Normal.Box.BorderRadius = theme.BorderRadius / 1.5f;
-            sheet.TextEdit.Normal.Box.BorderThickness = theme.BorderThickness;
+            sheet.TextEdit.Normal.Box.BorderThickness = textEditBorderDefault;
 
             sheet.TextEdit.Selected.SelectionColor = sheet.TextEdit.Normal.SelectionColor;
-            sheet.TextEdit.Selected.Box.BackColor = palette.Control.ToHovered(ctx);
+            sheet.TextEdit.Selected.Box.BackColor = palette.Control.ToHovered(ctx).ToHovered(ctx);
             sheet.TextEdit.Selected.Box.FrontColor = palette.Front;
             sheet.TextEdit.Selected.Box.BorderColor = palette.Accent.EnsureLightnessDistance(sheet.Window.Box.BackColor);
-            sheet.TextEdit.Selected.Box.BorderRadius = theme.BorderRadius / 2.0f;
-            sheet.TextEdit.Selected.Box.BorderThickness = theme.BorderThickness;
+            sheet.TextEdit.Selected.Box.BorderRadius = sheet.TextEdit.Normal.Box.BorderRadius;
+            sheet.TextEdit.Selected.Box.BorderThickness = textEditBorderSelected;
 
             sheet.TextEdit.HintFrontColor = palette.Front.WithAlpha(0.3f);
             sheet.TextEdit.CaretWidth = 2.0f;
@@ -223,10 +226,10 @@ namespace Imui.Style
             
             // button accent
 
-            sheet.EmbeddedButton = sheet.Button;
-            sheet.EmbeddedButton.Normal = sheet.Checkbox.Checked.Normal;
-            sheet.EmbeddedButton.Hovered = sheet.Checkbox.Checked.Hovered;
-            sheet.EmbeddedButton.Pressed = sheet.Checkbox.Checked.Pressed;
+            sheet.AccentButton = sheet.Button;
+            sheet.AccentButton.Normal = sheet.Checkbox.Checked.Normal;
+            sheet.AccentButton.Hovered = sheet.Checkbox.Checked.Hovered;
+            sheet.AccentButton.Pressed = sheet.Checkbox.Checked.Pressed;
 
             // radiobox
 
@@ -339,6 +342,7 @@ namespace Imui.Style
             // dropdown
             
             sheet.Dropdown.ArrowScale = 0.5f;
+            sheet.Dropdown.ArrowThickness = 2.0f;
             sheet.Dropdown.Button = sheet.Button;
             sheet.Dropdown.Button.Alignment = new ImAlignment(0.0f, 0.5f);
             sheet.Dropdown.Button.Overflow = ImTextOverflow.Ellipsis;

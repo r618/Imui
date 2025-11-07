@@ -104,12 +104,30 @@ namespace Imui.Controls
                                   out ImButtonState state,
                                   ImButtonFlag flag = ImButtonFlag.None)
         {
-            var clicked = Button(gui, id, rect, in style, out state, flag);
+            var clicked = Button(gui, id, in rect, in style, out state, flag);
             var textSettings = CreateTextSettings(gui, in style);
             var textColor = GetStateFrontColor(in style, state);
             var textRect = CalculateContentRect(gui, rect);
 
-            gui.Canvas.Text(label, textColor, textRect, in textSettings);
+            gui.Canvas.Text(label, textColor, in textRect, in textSettings);
+
+            return clicked;
+        }
+        
+        public static bool Button(this ImGui gui,
+                                  uint id,
+                                  ReadOnlySpan<char> label,
+                                  in ImRect rect,
+                                  in ImRect textRect,
+                                  in ImStyleButton style,
+                                  out ImButtonState state,
+                                  ImButtonFlag flag = ImButtonFlag.None)
+        {
+            var clicked = Button(gui, id, in rect, in style, out state, flag);
+            var textSettings = CreateTextSettings(gui, in style);
+            var textColor = GetStateFrontColor(in style, state);
+
+            gui.Canvas.Text(label, textColor, in textRect, in textSettings);
 
             return clicked;
         }
@@ -144,7 +162,7 @@ namespace Imui.Controls
 
         public static bool Button(this ImGui gui,
                                   uint id,
-                                  ImRect rect,
+                                  in ImRect rect,
                                   in ImStyleButton baseStyle,
                                   out ImButtonState state,
                                   ImButtonFlag flag = ImButtonFlag.None)

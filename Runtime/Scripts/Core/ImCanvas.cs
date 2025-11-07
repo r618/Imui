@@ -652,8 +652,8 @@ namespace Imui.Core
         /// <param name="text">The text to render.</param>
         /// <param name="color">The color of the text.</param>
         /// <param name="rect">The bounding rectangle for the text.</param>
-        /// <param name="settings">The settings for text alignment, size, and wrapping.</param>
-        public void Text(ReadOnlySpan<char> text, Color32 color, ImRect rect, in ImTextSettings settings)
+        /// <param name="settings">The settings for text alignment, size and wrapping.</param>
+        public void Text(ReadOnlySpan<char> text, Color32 color, in ImRect rect, in ImTextSettings settings)
         {
             ref readonly var layout = ref textDrawer.BuildTempLayout(
                 text, rect.W, rect.H,
