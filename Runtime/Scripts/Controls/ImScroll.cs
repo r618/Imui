@@ -53,7 +53,13 @@ namespace Imui.Controls
             var visibleRect = GetVisibleRect(gui, frame.Bounds, state);
 
             gui.Layout.Push(frame.Axis, visibleRect, ImLayoutFlag.None);
-            gui.Layout.SetOffset(state.Offset);
+            
+            // (artem-s): fixes flickering on lines and glyphs by snapping to pixel grid
+            var roundedOffset = state.Offset;
+            roundedOffset.x = Mathf.Round(roundedOffset.x * gui.Canvas.ScreenScale) / gui.Canvas.ScreenScale;
+            roundedOffset.y = Mathf.Round(roundedOffset.y * gui.Canvas.ScreenScale) / gui.Canvas.ScreenScale;
+            
+            gui.Layout.SetOffset(roundedOffset);
         }
 
         public static void EndScrollable(this ImGui gui, ImScrollFlag flags = ImScrollFlag.None)
