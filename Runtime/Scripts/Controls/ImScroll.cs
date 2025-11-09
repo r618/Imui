@@ -159,7 +159,8 @@ namespace Imui.Controls
             switch (evt.Type)
             {
                 case ImMouseEventType.Scroll when groupHovered:
-                    var factor = gui.Style.Layout.TextSize;
+                    var factor = 0.5f * gui.TextDrawer.GetLineHeightFromFontSize(gui.Style.Layout.TextSize);
+                    state.Velocity = default;
                     state.State |= ImScrollStateFlag.ConventionalScroll;
                     dx += evt.Delta.x * factor;
                     dy += evt.Delta.y * factor;

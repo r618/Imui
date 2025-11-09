@@ -6,7 +6,6 @@ using Imui.IO.Touch;
 using Imui.Utility;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
@@ -385,13 +384,9 @@ namespace Imui.IO.UGUI
 
             var dx = eventData.scrollDelta.x;
             var dy = -eventData.scrollDelta.y;
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-            dx = -dx;
-#endif
-
+            
             var device = GetDeviceType(eventData);
-            var delta = new Vector2(dx, dy);
+            var delta = ImUnityScrollUtility.ProcessScrollDelta(dx, dy);
             mouseEventsQueue.PushFront(new ImMouseEvent(ImMouseEventType.Scroll, (int)eventData.button, EventModifiers.None, delta, device));
         }
 
