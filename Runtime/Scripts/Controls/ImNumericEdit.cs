@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Imui.Core;
 using Imui.IO.Events;
 using Imui.IO.Touch;
@@ -579,9 +580,20 @@ namespace Imui.Controls
 
             gui.PopId();
 
-            var textBuffer = active
-                ? new ImTextEditBuffer(gui.Storage.Get<EditBuffer>(bufferId), gui.Arena, EditBuffer.BUFFER_LENGTH)
-                : new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena, 0);
+            ImTextEditBuffer textBuffer;
+
+            if (active)
+            {
+                ref readonly var editBuffer = ref gui.Storage.Get<EditBuffer>(bufferId);
+                var tempBuffer = gui.Arena.AllocArray<char>(editBuffer.Count);
+                EditBuffer.Copy(in editBuffer, tempBuffer);
+                
+                textBuffer = new ImTextEditBuffer(tempBuffer, tempBuffer.Length, gui.Arena, EditBuffer.BUFFER_LENGTH);
+            }
+            else
+            {
+                textBuffer = new ImTextEditBuffer(value.Format(gui.Formatter, format), gui.Arena, 0);
+            }
             
             var changed = false;
 
@@ -649,7 +661,7 @@ namespace Imui.Controls
             {
                 ref var editBuffer = ref gui.Storage.Get<EditBuffer>(bufferId);
                 editBuffer.Populate(value.Format(gui.Formatter));
-                ImTextEdit.SelectAll(gui, id, editBuffer);
+                ImTextEdit.SelectAll(gui, id, editBuffer.Count);
             }
 
             if (delta != 0)
@@ -732,12 +744,15 @@ namespace Imui.Controls
             Double
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         public unsafe struct EditBuffer
         {
-            public const int BUFFER_LENGTH = 256;
+            public const int BUFFER_LENGTH = 126;
 
-            private fixed char fixedBuffer[BUFFER_LENGTH];
+            public int Count => count;
+
             private int count;
+            private fixed char fixedBuffer[BUFFER_LENGTH];
 
             public void Populate(ReadOnlySpan<char> str)
             {
@@ -749,10 +764,16 @@ namespace Imui.Controls
                     count = stringToCopy.Length;
                 }
             }
-
-            public static implicit operator ReadOnlySpan<char>(EditBuffer buffer)
+            
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int Copy(in EditBuffer from, Span<char> to)
             {
-                return new ReadOnlySpan<char>(buffer.fixedBuffer, buffer.count);
+                fixed (char* buf = from.fixedBuffer)
+                {
+                    var toCopy = Math.Min(from.count, to.Length);
+                    new Span<char>(buf, toCopy).CopyTo(to);
+                    return toCopy;
+                }
             }
         }
 

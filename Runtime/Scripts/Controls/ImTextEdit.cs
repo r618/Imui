@@ -38,10 +38,7 @@ namespace Imui.Controls
 
         private Span<char> mutable;
         private int mutableLength;
-
-        public ImTextEditBuffer(int mutableLength, ImArena arena, int maxLength):
-            this(arena.AllocArray<char>(mutableLength), mutableLength, arena, maxLength) { }
-
+        
         public ImTextEditBuffer(string source, ImArena arena, int maxLength)
         {
             this.arena = arena;
@@ -530,11 +527,11 @@ namespace Imui.Controls
             return textChanged;
         }
 
-        public static void SelectAll(ImGui gui, uint id, ReadOnlySpan<char> text)
+        public static void SelectAll(ImGui gui, uint id, int length)
         {
             ref var state = ref gui.Storage.Get<ImTextEditState>(id);
-            state.Caret = text.Length;
-            state.Selection = -text.Length;
+            state.Caret = length;
+            state.Selection = -length;
             state.BlinkTime = gui.Input.Time;
         }
 
