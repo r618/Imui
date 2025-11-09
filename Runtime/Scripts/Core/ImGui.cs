@@ -251,9 +251,13 @@ namespace Imui.Core
 
         public void LoadDefaultFont()
         {
-            TextDrawer.LoadFont(Resources.Load<Font>("Imui/FiraMono-Regular"));
-        }
+            var font = Resources.Load<Font>("Imui/FiraMono-Regular");
+            var size = font.fontSize;
+            var mode = ImGlyphRenderMode.Sdf;
 
+            TextDrawer.LoadFont(font, size, mode);
+        }
+        
         public void BeginReadOnly(bool isReadOnly)
         {
             readOnlyStack.Push(isReadOnly);
