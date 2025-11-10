@@ -411,17 +411,26 @@ namespace Imui.Style
 
             // tab
 
-            sheet.Tabs.IndicatorColor = palette.Accent;
+            var tabSelectedBackColor = theme.BorderThickness > 0 ? palette.Back : palette.Accent;
+            var tabSelectedBackColorHovered = theme.BorderThickness > 0 ? palette.Back : palette.Accent.ToHovered(ctx);
+            var tabSelectedFrontColor = theme.BorderThickness > 0 ? palette.Front : palette.AccentFront;
+
+            sheet.Tabs.SeparatorColor = palette.Accent.HalfAscend(ctx);
+            sheet.Tabs.SeparatorThickness = theme.BorderThickness > 0.0f ? 0.0f : sheet.Separator.Thickness; // display only when borders are off by default
             sheet.Tabs.Normal = sheet.Button;
             sheet.Tabs.Normal.BorderRadius.BottomLeft = 0.0f;
             sheet.Tabs.Normal.BorderRadius.BottomRight = 0.0f;
             sheet.Tabs.Selected = sheet.Button;
             sheet.Tabs.Selected.BorderRadius.BottomLeft = 0.0f;
             sheet.Tabs.Selected.BorderRadius.BottomRight = 0.0f;
-            sheet.Tabs.Selected.Normal.BackColor = palette.Back;
-            sheet.Tabs.Selected.Hovered.BackColor = sheet.Tabs.Selected.Normal.BackColor;
+            sheet.Tabs.Selected.Normal.BackColor = tabSelectedBackColor;
+            sheet.Tabs.Selected.Normal.FrontColor = tabSelectedFrontColor;
+            sheet.Tabs.Selected.Hovered.BackColor = tabSelectedBackColorHovered;
+            sheet.Tabs.Selected.Hovered.FrontColor = sheet.Tabs.Selected.Normal.FrontColor;
+            sheet.Tabs.Selected.Pressed.BackColor = tabSelectedBackColor;
+            sheet.Tabs.Selected.Pressed.FrontColor = sheet.Tabs.Selected.Normal.FrontColor;
 
-            sheet.Tabs.ContainerBox.BackColor = sheet.Tabs.Selected.Normal.BackColor;
+            sheet.Tabs.ContainerBox.BackColor = palette.Back;
             sheet.Tabs.ContainerBox.BorderColor = sheet.Tabs.Selected.Normal.BorderColor;
             sheet.Tabs.ContainerBox.BorderRadius = sheet.Tabs.Selected.BorderRadius;
             sheet.Tabs.ContainerBox.BorderRadius.TopLeft = 0;

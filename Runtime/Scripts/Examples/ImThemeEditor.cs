@@ -52,9 +52,9 @@ namespace Imui.Examples
             using (new LabeledScope(gui, nameof(theme.ExtraRowHeight))) changed |= gui.Slider(ref theme.ExtraRowHeight, 0.0f, 128.0f);
             using (new LabeledScope(gui, nameof(theme.ScrollBarSize))) changed |= gui.Slider(ref theme.ScrollBarSize, 2.0f, 128.0f);
             using (new LabeledScope(gui, nameof(theme.WindowBorderRadius))) changed |= gui.Slider(ref theme.WindowBorderRadius, 0.0f, 32.0f);
-            using (new LabeledScope(gui, nameof(theme.WindowBorderThickness))) changed |= gui.Slider(ref theme.WindowBorderThickness, 0.0f, 8.0f);
+            using (new LabeledScope(gui, nameof(theme.WindowBorderThickness))) changed |= gui.Slider(ref theme.WindowBorderThickness, 0.0f, 8.0f, step: 0.5f);
             using (new LabeledScope(gui, nameof(theme.BorderRadius))) changed |= gui.Slider(ref theme.BorderRadius, 0.0f, 16.0f);
-            using (new LabeledScope(gui, nameof(theme.BorderThickness))) changed |= gui.Slider(ref theme.BorderThickness, 0.0f, 8.0f);
+            using (new LabeledScope(gui, nameof(theme.BorderThickness))) changed |= gui.Slider(ref theme.BorderThickness, 0.0f, 8.0f, step: 0.5f);
             using (new LabeledScope(gui, nameof(theme.ReadOnlyColorMultiplier))) changed |= gui.Slider(ref theme.ReadOnlyColorMultiplier, 0.0f, 8.0f);
 
             return changed;

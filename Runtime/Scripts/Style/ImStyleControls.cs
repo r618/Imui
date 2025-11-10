@@ -231,8 +231,9 @@ namespace Imui.Style
     {
         public ImStyleButton Normal;
         public ImStyleButton Selected;
-        public Color32 IndicatorColor;
         public ImStyleBox ContainerBox;
+        public float SeparatorThickness;
+        public Color32 SeparatorColor;
     }
 
     [Serializable]

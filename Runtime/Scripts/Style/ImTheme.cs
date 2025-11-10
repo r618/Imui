@@ -53,7 +53,7 @@ namespace Imui.Style
                 WindowBorderRadius = 8f,
                 WindowBorderThickness = 1f,
                 BorderRadius = 5f,
-                BorderThickness = 0.98f,
+                BorderThickness = 1f,
                 ReadOnlyColorMultiplier = 0.9f,
                 Background = new Color32(255, 255, 255, 255),
                 Foreground = new Color32(30, 30, 30, 255),

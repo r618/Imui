@@ -1,8 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using Imui.Core;
-using Imui.Style;
-using UnityEngine;
 
 namespace Imui.Controls
 {
@@ -76,7 +74,16 @@ namespace Imui.Controls
             }
 
             gui.Box(state->Content, in gui.Style.Tabs.ContainerBox);
-            CoverSeam(gui, state->Content, rect);
+
+            if (gui.Style.Tabs.SeparatorThickness > 0.0f)
+            {
+                var sepRect = state->Content.TakeTop(gui.Style.Tabs.SeparatorThickness);
+                gui.Canvas.Rect(sepRect, gui.Style.Tabs.SeparatorColor);
+            }
+            else
+            {
+                CoverSeam(gui, state->Content, rect);
+            }
 
             gui.PushId(id);
             gui.Layout.Push(ImAxis.Vertical, state->Content.WithPadding(gui.Style.Layout.Spacing));
@@ -123,18 +130,8 @@ namespace Imui.Controls
 
             var clicked = gui.Button(id, rect, in buttonStyle, out var state);
             var frontColor = ImButton.GetStateFrontColor(in buttonStyle, state);
-
-            if (selected)
-            {
-                var p = gui.Style.Button.BorderThickness;
-                var r = Mathf.Max(0, gui.Style.Button.BorderRadius.TopLeft - p);
-                var indicatorRect = rect.TakeTop(Mathf.Max(3, gui.Style.Button.BorderRadius.TopLeft)).WithPadding(left: p, right: p, top: p);
-                var indicatorRadius = new ImRectRadius(topLeft: r, topRight: r);
-
-                gui.Canvas.Rect(indicatorRect, gui.Style.Tabs.IndicatorColor, indicatorRadius);
-            }
-
             var textSettings = GetTextSettings(gui);
+            
             gui.Text(label, in textSettings, frontColor, rect);
             
             return clicked;
