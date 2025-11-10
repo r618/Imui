@@ -496,6 +496,7 @@ namespace Imui.Rendering
             layout.LinesCount = 0;
             layout.Scale = size / FontRenderSize;
             layout.OffsetX = boundsWidth * alignX;
+            layout.OffsetY = 0.0f;
             layout.Width = 0;
             layout.Height = 0;
             layout.Size = size;
