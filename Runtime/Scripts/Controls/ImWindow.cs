@@ -29,16 +29,16 @@ namespace Imui.Controls
         {
             var rect = GetInitialWindowRect(gui, size);
 
-            return BeginWindow(gui, title, ref open, rect, flags);
+            return BeginWindow(gui, title, ref open, ref rect, flags);
         }
 
-        public static void BeginWindow(this ImGui gui, string title, ImRect rect, ImWindowFlag flags = ImWindowFlag.None)
+        public static void BeginWindow(this ImGui gui, string title, ref ImRect rect, ImWindowFlag flags = ImWindowFlag.None)
         {
             var open = true;
-            BeginWindow(gui, title, ref open, rect, flags | ImWindowFlag.NoCloseButton);
+            BeginWindow(gui, title, ref open, ref rect, flags | ImWindowFlag.NoCloseButton);
         }
 
-        public static bool BeginWindow(this ImGui gui, string title, ref bool open, ImRect rect, ImWindowFlag flags = ImWindowFlag.None)
+        public static bool BeginWindow(this ImGui gui, string title, ref bool open, ref ImRect rect, ImWindowFlag flags = ImWindowFlag.None)
         {
             if (!open)
             {
@@ -80,6 +80,8 @@ namespace Imui.Controls
 
             gui.Layout.Push(ImAxis.Vertical, contentRect);
             gui.BeginScrollable();
+
+            rect = state.Rect;
 
             return true;
         }
