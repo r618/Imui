@@ -63,9 +63,8 @@ namespace Imui.IO.UGUI
         {
             get
             {
-                // Created lazily rather than in Awake: after an assembly reload [ExecuteAlways]
-                // components only get OnEnable, and with Enter Play Mode Options they get neither
-                // Awake nor OnEnable when entering play — an Awake-only setup leaves the canvas
+                // Created lazily rather than in Awake: after an assembly reload [ExecuteAlways] components only get OnEnable, 
+                // and when entering play mode w/ disabled domain/scene reload an Awake-only setup leaves the canvas
                 // rebuild binding base.defaultMaterial, which skips the color-space conversion
                 // this backend's shader performs in Linear projects.
                 var material = GetDefaultMaterial();
