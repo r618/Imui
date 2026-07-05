@@ -66,26 +66,6 @@ namespace Imui.IO.Utility
             return IsFinite(position);
         }
         
-        public static bool IsTouchBeganThisFrame()
-        {
-            var touchscreen = Touchscreen.current;
-            if (touchscreen == null)
-            {
-                return false;
-            }
-
-            var touches = touchscreen.touches;
-            for (int i = 0; i < touches.Count; ++i)
-            {
-                if (WasTouchPressedThisFrame(touches[i]))
-                {
-                    return true;
-                }
-            }
-
-            return WasTouchPressedThisFrame(touchscreen.primaryTouch);
-        }
-
         static bool TryGetActiveTouch(out TouchControl touch)
         {
             var touchscreen = Touchscreen.current;
@@ -112,13 +92,6 @@ namespace Imui.IO.Utility
 
             touch = null;
             return false;
-        }
-
-        static bool WasTouchPressedThisFrame(TouchControl touch)
-        {
-            return touch != null
-                && (touch.press.wasPressedThisFrame
-                    || touch.phase.ReadValue() == UnityEngine.InputSystem.TouchPhase.Began);
         }
 
         static bool IsActiveTouch(TouchControl touch)
