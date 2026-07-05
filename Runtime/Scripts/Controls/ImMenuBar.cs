@@ -52,10 +52,7 @@ namespace Imui.Controls
             gui.Layout.Push(ImAxis.Horizontal, rect);
             gui.Canvas.PushOrder(order);
 
-            if (!gui.WindowManager.IsDrawingWindow())
-            {
-                gui.RegisterRaycastTarget(rect);
-            }
+            gui.RegisterControl(id, rect);
 
             gui.Box(rect, in gui.Style.MenuBar.Box);
         }
