@@ -1,4 +1,3 @@
-using Imui.IO.UGUI;
 using UnityEditor;
 
 namespace Imui.Editor.Scripts
@@ -11,7 +10,7 @@ namespace Imui.Editor.Scripts
             var raycastTarget = serializedObject.FindProperty("m_RaycastTarget");
             var scalingMode = serializedObject.FindProperty("scalingMode");
             var customScale = serializedObject.FindProperty("customScale");
-            
+
             EditorGUILayout.PropertyField(raycastTarget);
             EditorGUILayout.PropertyField(scalingMode);
 
