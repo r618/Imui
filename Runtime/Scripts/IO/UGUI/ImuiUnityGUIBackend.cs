@@ -186,11 +186,6 @@ namespace Imui.IO.UGUI
             return DefaultMaterial;
         }
 
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-        }
-
         // ReSharper disable once ParameterHidesMember
         public void UseRaycaster(IImuiInput.RaycasterDelegate raycaster)
         {
